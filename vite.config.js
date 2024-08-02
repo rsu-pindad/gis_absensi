@@ -16,4 +16,7 @@ export default defineConfig({
     //         'mapboxgl':  'mapboxgl',
     //     },
     // },
+    build: {
+        chunkSizeWarningLimit: 2000
+    }
 });
