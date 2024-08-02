@@ -93,6 +93,15 @@ new class extends Component
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                 {{ __('Beranda') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('gis')" :active="request()->routeIs('gis')" wire:navigate>
+                {{ __('GIS') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('absen')" :active="request()->routeIs('absen')" wire:navigate>
+                {{ __('Absen') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate>
+                {{ __('Presensi') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->
