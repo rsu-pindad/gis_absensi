@@ -32,5 +32,6 @@
                 {{ $slot }}
             </main>
         </div>
+        @stack('modulejs')
     </body>
 </html>

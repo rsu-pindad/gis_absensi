@@ -213,4 +213,8 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+    'maps' => [
+        'mapbox_token' => env('MAPBOX_TOKEN', ''),
+    ],
+
 ];
