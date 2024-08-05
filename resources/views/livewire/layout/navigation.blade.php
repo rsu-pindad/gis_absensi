@@ -42,6 +42,9 @@ new class extends Component
                     <x-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate>
                         {{ __('Presensi') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate>
+                        {{ __('Absensi Dinas') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -101,6 +104,9 @@ new class extends Component
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate>
                 {{ __('Presensi') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate>
+                {{ __('Absensi Dinas') }}
             </x-responsive-nav-link>
         </div>
 
