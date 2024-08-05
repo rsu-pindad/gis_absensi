@@ -2,18 +2,27 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attribute\Locked;
+// use Livewire\Attribute\Validate;
+// use Livewire\Attribute\On;
+// use Livewire\Attribute\Renderless;
 use App\Models\Absensi;
 
 new class extends Component {
     
-    
     #[Locked]
     public $selectName = 'parentLokasi'; 
+
     #[Locked]
     public $absensi; 
     
-    public $selectAbsensi = '';
-    public $otp;
+    public $selectAbsensi;
+    public $otp = 'otp sedang dihitung...';
+
+    function boot()
+    {
+        // $this->dispatch('otp-start');
+        $this->otp = rand(1000, 9999);
+    }
 
     function mount()
     {
@@ -22,6 +31,7 @@ new class extends Component {
 
     function generate()
     {
+        $this->skipRender();
         $this->otp = rand(1000, 9999);
     }
 
@@ -44,41 +54,49 @@ new class extends Component {
 
         <div class="flex-auto">
             <x-input-label for="otp" :value="__('OTP')" />
-            {{-- <x-text-input wire:model.live="otp" wire:poll.5s="generate" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly /> --}}
+            <x-text-input wire:model="otp" wire:poll.5s="generate" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
             <x-input-error class="mt-2" :messages="$errors->get('otp')" />
         </div>
-        
-        <x-action-message class="me-3" on="scanned">
-            {{ __('Secan berhasil.') }}
-        </x-action-message>
 
+        <x-action-message class="me-3" on="scanned">
+            {{ __('Berhasil Absen') }}
+        </x-action-message>
     </form>
-    
-    <div id="reader" class="w-full h-96 my-6"></div>
+
+    @persist('scannerAbsen')
+    <div id="reader" class="w-full my-6"></div>
+    @endpersist
 
 </section>
 
 @push('modulejs')
 <script type="module">
+    const detected = detect(window.navigator.userAgent);
+    // console.log(detected);
+    const deviceInfo = detected.device;
+    const osInfo = detected.os;
+    // console.log(deviceInfo);
+    // console.log(osInfo);
+    const config = { 
+        fps: 12,
+        qrbox: {width: 200, height: 200},
+        disableFlip: true,
+    }
 
-    function onScanSuccess(decodedText, decodedResult) {
-        // handle the scanned code as you like, for example:
-        @this.test = decodedResult.result.text
-        @this.dispatch('scanned')
+    const html5QrCode = new Html5Qrcode("reader");
+
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
         console.log(`Code matched = ${decodedText}`, decodedResult);
-    }
-
-    function onScanFailure(error) {
-        // handle scan failure, usually better to ignore and keep scanning.
-        // for example:
+    };
+    const qrCodeErrorCallback = (error) => {
         console.warn(`Code scan error = ${error}`);
-    }
-
-    let html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader",
-        { fps: 10, qrbox: {width: 200, height: 200} },
-        /* verbose= */ false);
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-
+    };
+    html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
+    
+    // document.addEventListener('otp-start', async function (event) {  
+        // await html5QrCode.stop();
+        // await html5QrCode.clear();
+        // html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
+    // });
 </script>
 @endpush
