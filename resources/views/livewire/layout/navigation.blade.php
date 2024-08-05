@@ -42,6 +42,9 @@ new class extends Component
                     <x-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate>
                         {{ __('Presensi') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate>
+                        {{ __('Absensi Dinas') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -92,6 +95,18 @@ new class extends Component
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                 {{ __('Beranda') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('gis')" :active="request()->routeIs('gis')" wire:navigate>
+                {{ __('GIS') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('absen')" :active="request()->routeIs('absen')" wire:navigate>
+                {{ __('Absen') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate>
+                {{ __('Presensi') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate>
+                {{ __('Absensi Dinas') }}
             </x-responsive-nav-link>
         </div>
 

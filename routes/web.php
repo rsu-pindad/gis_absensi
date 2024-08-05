@@ -31,6 +31,9 @@ Route::middleware('auth')->group(function () {
 
     Route::view('presensi', 'presensi')
         ->name('presensi');
+
+    Route::view('dinas', 'dinas')
+        ->name('dinas');
 });
 
 require __DIR__ . '/auth.php';
