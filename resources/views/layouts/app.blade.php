@@ -30,6 +30,10 @@
             <!-- Page Content -->
             <main>
                 {{ $slot }}
+
+                @persist('scannerAbsen')
+                @endpersist
+
             </main>
         </div>
         @stack('modulejs')
