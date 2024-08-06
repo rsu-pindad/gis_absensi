@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
  * |--------------------------------------------------------------------------
@@ -34,6 +35,12 @@ Route::middleware('auth')->group(function () {
 
     Route::view('dinas', 'dinas')
         ->name('dinas');
+
+    Route::get('/signedabsen/{user}', function(Request $request){
+        if (! $request->hasValidSignature()) {
+            abort(401);
+        }
+    })->name('signedabsen');
 });
 
 require __DIR__ . '/auth.php';
