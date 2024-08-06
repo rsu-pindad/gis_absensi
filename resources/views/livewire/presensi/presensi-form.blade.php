@@ -1,10 +1,10 @@
 <?php
 
 use Livewire\Volt\Component;
-use Livewire\Attribute\Locked;
-// use Livewire\Attribute\Validate;
-// use Livewire\Attribute\On;
-// use Livewire\Attribute\Renderless;
+use Livewire\Attributes\Locked;
+// use Livewire\Attributes\Validate;
+// use Livewire\Attributes\On;
+// use Livewire\Attributes\Renderless;
 use App\Models\Absensi;
 
 new class extends Component {
@@ -15,8 +15,12 @@ new class extends Component {
     #[Locked]
     public $absensi; 
     
+    #[Locked]
     public $selectAbsensi;
+    
     public $otp = 'otp sedang dihitung...';
+    
+    public string $token;
 
     function boot()
     {
