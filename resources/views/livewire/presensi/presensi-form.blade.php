@@ -138,7 +138,8 @@ new class extends Component {
     const qrCodeErrorCallback = (error) => {
         console.warn(`Code scan error = ${error}`);
     };
-    html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
+    // html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
+    html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
     
     Livewire.on('info-absen',() => {
     //     console.log('resumed');
