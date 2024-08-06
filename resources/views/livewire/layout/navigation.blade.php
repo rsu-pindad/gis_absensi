@@ -30,19 +30,19 @@ new class extends Component
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate=false>
                         {{ __('Beranda') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('gis')" :active="request()->routeIs('gis')" wire:navigate>
+                    <x-nav-link :href="route('gis')" :active="request()->routeIs('gis')" wire:navigate=false>
                         {{ __('GIS') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('absen')" :active="request()->routeIs('absen')" wire:navigate>
+                    <x-nav-link :href="route('absen')" :active="request()->routeIs('absen')" wire:navigate=false>
                         {{ __('Absen') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate>
+                    <x-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate=false>
                         {{ __('Presensi') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate>
+                    <x-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate=false>
                         {{ __('Absensi Dinas') }}
                     </x-nav-link>
                 </div>
