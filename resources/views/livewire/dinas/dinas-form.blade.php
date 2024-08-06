@@ -3,6 +3,8 @@
 use Livewire\Volt\Component;
 use Livewire\Attributes\On; 
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Renderless;
+use Illuminate\Support\Facades\URL;
 
 new class extends Component {
 
@@ -15,9 +17,14 @@ new class extends Component {
     public $resultInformation;
 
     public $otp;
+    public $information;
+    public $resultUser;
 
     #[Locked]
     public string $token;
+
+    #[Locked]
+    public $absen;
 
     function boot()
     {
@@ -25,10 +32,27 @@ new class extends Component {
         $this->id = Auth::id();
     }
 
+    #[Renderless]
+    function buatBarcode()
+    {
+        // $new = [];
+        $informasiUser = $this->information;
+        
+        $this->absen = URL::temporarySignedRoute('signedabsen',now()->addHours(1),['user' => Auth::id()], absolute: false);
+        $informasiUser['absen'] = $this->absen; 
+        $informasiUser['otp'] = $this->otp; 
+        // dd($informasiUser);
+        $jsonData = json_encode($informasiUser);
+        $this->resultUser = DNS2D::getBarcodePNG($jsonData,'QRCODE');
+        // $this->resultUser = DNS2D::getBarcodeHTML($jsonData,'QRCODE');
+        $this->dispatch('generated-barcode');
+    }
+
     #[On('lokasi-didapat')]
+    #[Renderless]
     function setLokasi()
     {
-        $information = [
+        $this->information = [
             'id' => Auth::id(),
             'npp' => Auth::user()->npp,
             'instansi' => $this->instansi,
@@ -36,13 +60,15 @@ new class extends Component {
             'lotd' => $this->lotd,
             'latd' => $this->latd,
             'device' => $this->deviceInformasi,
-            'os' => $this->osInformasi
+            'os' => $this->osInformasi,
+            'absen' => $this->absen,
         ];
-        $jsonData = json_encode($information);
-        $this->resultInformation = DNS2D::getBarcodePNG($jsonData,'QRCODE');
-        $this->skipRender();
+        // $this->jsonData = json_encode($information);
+        // $this->resultInformation = DNS2D::getBarcodePNG($jsonData,'QRCODE');
+        // $this->skipRender();
         // $this->js("alert('Post saved!')");
         // $this->dispatch('lokasi-update')->self();
+        $this->dispatch('open-button');
     }
 
 }; ?>
@@ -51,15 +77,25 @@ new class extends Component {
 
     <div id="map" class="w-full h-96 my-6"></div>
 
-    <div class="bg-stone-100 my-4 p-4 border-2" id="barcodeUsers"></div>
-
-    <form>
-        <div class="flex-auto">
+    <form wire:submit="buatBarcode" class="mt-6 space-y-6">
+        <div>
             <x-input-label for="otp" :value="__('OTP')" />
-            <x-text-input wire:model.live="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
+            <x-text-input wire:model="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required disabled />
             <x-input-error class="mt-2" :messages="$errors->get('otp')" />
         </div>
+
+        <div class="flex items-center gap-4">
+            <x-primary-button>{{ __('Buat Barcode') }}</x-primary-button>
+
+            <x-action-message class="me-3" on="buat-barcode">
+                {{ __('Barcode dibuat.') }}
+            </x-action-message>
+        </div>
     </form>
+
+    <div class="bg-stone-100 my-4 p-4 border-2" id="barcodeUsers">
+
+    </div>
 
 </section>
 
@@ -71,6 +107,10 @@ new class extends Component {
     const osInfo = detected.os;
     // console.log(deviceInfo);
     // console.log(osInfo);
+    
+    let getInfo;
+    let target = document.querySelector('#barcodeUsers');
+    let images = document.createElement('img');
     
     mapboxgl.accessToken = `{{$this->token}}`;
     
@@ -87,9 +127,6 @@ new class extends Component {
         zoom: 1,
     });
     map.scrollZoom.disable();
-    let getInfo;
-    let target = document.querySelector('#barcodeUsers');
-    let images = document.createElement('img');
     map.addControl(
         new mapboxgl.GeolocateControl({
             positionOptions: {
@@ -106,16 +143,36 @@ new class extends Component {
             @this.osInformasi = osInfo;
             Livewire.dispatch('lokasi-didapat');
 
-            getInfo = await @this.resultInformation;
-            target.innerHTML = '';
-            images.setAttribute('height', 200);
-            images.setAttribute('width', 200);
-            images.setAttribute('src', `data:image/png;base64,${getInfo}`);
-            target.appendChild(images);
+            // getInfo = await this.resultInformation;
+            // target.innerHTML = '';
+            // images.setAttribute('height', 200);
+            // images.setAttribute('width', 200);
+            // images.setAttribute('src', `data:image/png;base64,${getInfo}`);
+            // target.appendChild(images);
+            // target.appendChild(getInfo);
             // console.log(getInfo);
             // return getInfo;
         })
     );
+
+    Livewire.on('open-button', () => {
+        // console.log('button-openend');
+        document.getElementById('otp').disabled = false;
+        // let targetButton = document.querySelector('#otp');
+        // targetButton.setAttribute(disabled, false);
+    });
+
+    Livewire.on('generated-barcode', async () => {
+        getInfo = await @this.resultUser;
+        target.innerHTML = '';
+        images.setAttribute('height', 200);
+        images.setAttribute('width', 200);
+        images.setAttribute('src', `data:image/png;base64,${getInfo}`);
+        target.appendChild(images);
+        // console.log(getInfo);
+        // return getInfo;
+        // target.innerHTML = getInfo;
+    })
 
 </script>
 @endpush
