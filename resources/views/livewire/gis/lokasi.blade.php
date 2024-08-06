@@ -14,6 +14,13 @@ new class extends Component
 
     public string $alamat = '';
 
+    public string $token = '';
+
+    public function boot()
+    {
+        $this->token = config('app.maps.mapbox_token');
+    }
+
     public function simpanLokasi() : void
     {
         $lokasi = new Lokasi;
@@ -86,7 +93,7 @@ new class extends Component
 
 @push('modulejs')
 <script type="module">
-    mapboxgl.accessToken = "pk.eyJ1IjoibWFwYm94LXJzdSIsImEiOiJjbHo4NWd2ODcwM2R3MnBxdmRjcDZ6Z2VsIn0.1ADkuMnClPbKOulkqBOYPw";
+    mapboxgl.accessToken = `{{$this->token}}`;
     const map = new mapboxgl.Map({
         container: 'map',
         // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
@@ -120,7 +127,6 @@ new class extends Component
             },
             trackUserLocation: true,
             showUserHeading: true,
-            trackUserLocation: true,
         }).on('geolocate', (e) => {
             // console.log(e);
             // console.log(e.coords.latitude);

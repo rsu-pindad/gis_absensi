@@ -33,6 +33,8 @@
 
                 @persist('scannerAbsen')
                 @endpersist
+                @persist('mapsAbsen')
+                @endpersist
 
             </main>
         </div>
