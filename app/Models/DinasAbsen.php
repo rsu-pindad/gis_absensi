@@ -48,13 +48,13 @@ class DinasAbsen extends Model
         return $this->belongsTo(User::class, 'petugas_id', 'id');
     }
 
-    public function parentPresensi(): BelongsTo
+    public function parentAbsensi(): BelongsTo
     {
-        return $this->belongsTo(Presensi::class, 'presensi_id', 'id');
+        return $this->belongsTo(Absensi::class, 'absensi_id', 'id');
     }
 
     public function scopeSearch($query, $value)
     {
-        $query->where('presensi_id', 'like', "%{$value}%");
+        $query->where('absensi_id', 'like', "%{$value}%");
     }
 }

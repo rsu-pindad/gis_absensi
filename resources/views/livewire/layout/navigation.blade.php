@@ -45,6 +45,9 @@ new class extends Component
                     <x-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate=false>
                         {{ __('Absensi Dinas') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('finger')" :active="request()->routeIs('finger')" wire:navigate=false>
+                        {{ __('Finger Absensi Dinas') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -107,6 +110,9 @@ new class extends Component
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate=false>
                 {{ __('Absensi Dinas') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('finger')" :active="request()->routeIs('finger')" wire:navigate=false>
+                {{ __('Finger Absensi Dinas') }}
             </x-responsive-nav-link>
         </div>
 
