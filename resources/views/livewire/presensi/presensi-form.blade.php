@@ -75,12 +75,6 @@ new class extends Component {
 
 @push('modulejs')
 <script type="module">
-    const detected = detect(window.navigator.userAgent);
-    // console.log(detected);
-    const deviceInfo = detected.device;
-    const osInfo = detected.os;
-    // console.log(deviceInfo);
-    // console.log(osInfo);
     const config = { 
         fps: 12,
         qrbox: {width: 200, height: 200},

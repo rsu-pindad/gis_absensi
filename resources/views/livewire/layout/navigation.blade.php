@@ -93,19 +93,19 @@ new class extends Component
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate=false>
                 {{ __('Beranda') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('gis')" :active="request()->routeIs('gis')" wire:navigate>
+            <x-responsive-nav-link :href="route('gis')" :active="request()->routeIs('gis')" wire:navigate=false>
                 {{ __('GIS') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('absen')" :active="request()->routeIs('absen')" wire:navigate>
+            <x-responsive-nav-link :href="route('absen')" :active="request()->routeIs('absen')" wire:navigate=false>
                 {{ __('Absen') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate>
+            <x-responsive-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate=false>
                 {{ __('Presensi') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate>
+            <x-responsive-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate=false>
                 {{ __('Absensi Dinas') }}
             </x-responsive-nav-link>
         </div>

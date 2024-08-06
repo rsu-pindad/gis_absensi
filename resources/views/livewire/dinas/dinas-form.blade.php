@@ -2,28 +2,26 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\On; 
+use Livewire\Attributes\Locked;
 
 new class extends Component {
-
-    public $qr;
-    public $resultInformation;
 
     public $lotd;
     public $latd;
     public $instansi;
     public $alamat;
+    public $deviceInformasi;
+    public $osInformasi;
+    public $resultInformation;
 
     public $otp;
 
+    #[Locked]
     public string $token;
 
     function boot()
     {
         $this->token = config('app.maps.mapbox_token');
-    }
-
-    function mount()
-    {
         $this->id = Auth::id();
     }
 
@@ -37,6 +35,8 @@ new class extends Component {
             'alamat' => $this->alamat,
             'lotd' => $this->lotd,
             'latd' => $this->latd,
+            'device' => $this->deviceInformasi,
+            'os' => $this->osInformasi
         ];
         $jsonData = json_encode($information);
         $this->resultInformation = DNS2D::getBarcodePNG($jsonData,'QRCODE');
@@ -56,7 +56,7 @@ new class extends Component {
     <form>
         <div class="flex-auto">
             <x-input-label for="otp" :value="__('OTP')" />
-            <x-text-input wire:model.live="otp"  id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
+            <x-text-input wire:model.live="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
             <x-input-error class="mt-2" :messages="$errors->get('otp')" />
         </div>
     </form>
@@ -65,7 +65,15 @@ new class extends Component {
 
 @push('modulejs')
 <script type="module">
+    const detected = detect(window.navigator.userAgent);
+    // console.log(detected);
+    const deviceInfo = detected.device;
+    const osInfo = detected.os;
+    // console.log(deviceInfo);
+    // console.log(osInfo);
+    
     mapboxgl.accessToken = `{{$this->token}}`;
+    
     if(!mapboxgl.supported()){
         alert('browser (peramban) tidak mendukung maps');
     }
@@ -94,6 +102,8 @@ new class extends Component {
             @this.latd = e.coords.longitude ?? null;
             @this.instansi = null;
             @this.alamat = null;
+            @this.deviceInformasi = deviceInfo;
+            @this.osInformasi = osInfo;
             Livewire.dispatch('lokasi-didapat');
 
             getInfo = await @this.resultInformation;
