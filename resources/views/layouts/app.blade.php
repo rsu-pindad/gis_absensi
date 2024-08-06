@@ -39,5 +39,6 @@
             </main>
         </div>
         @stack('modulejs')
+        <x-livewire-alert::scripts />
     </body>
 </html>
