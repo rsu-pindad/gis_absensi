@@ -36,6 +36,9 @@ Route::middleware('auth')->group(function () {
     Route::view('dinas', 'dinas')
         ->name('dinas');
 
+    Route::view('finger', 'finger')
+        ->name('finger');
+
     Route::get('/signedabsen/{user}', function(Request $request){
         if (! $request->hasValidSignature()) {
             abort(401);
