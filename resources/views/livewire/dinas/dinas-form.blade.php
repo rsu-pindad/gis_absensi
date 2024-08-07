@@ -93,8 +93,7 @@ new class extends Component {
         </div>
     </form>
 
-    <div class="bg-stone-100 my-4 p-4 border-2" id="barcodeUsers">
-
+    <div id="barcodeUsers">
     </div>
 
 </section>
@@ -167,6 +166,7 @@ new class extends Component {
         target.innerHTML = '';
         images.setAttribute('height', 200);
         images.setAttribute('width', 200);
+        images.setAttribute('class', 'bg-stone-100 my-4 p-4 border-2');
         images.setAttribute('src', `data:image/png;base64,${getInfo}`);
         target.appendChild(images);
         // console.log(getInfo);
