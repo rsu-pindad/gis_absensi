@@ -41,8 +41,18 @@ new class extends Component {
     {
         $this->otp = rand(1000, 9999);
         // $this->dispatch('camera-start', otp:$this->otp);
+        // if($this->stateCamera == false){
+        //     $this->dispatch('camera-start');
+        // }
+    }
+
+    #[On('select-camera')]
+    #[Renderless]
+    function selectCamera($cameraId) : void
+    {
+        // dd($cameraId);
         if($this->stateCamera == false){
-            $this->dispatch('camera-start');
+            $this->dispatch('camera-start', cameraId:$cameraId);
         }
     }
 
@@ -157,6 +167,12 @@ new class extends Component {
         </div>
     </form>
     {{-- <div id="reader" class="w-full my-6"></div> --}}
+    <div class="mt-6">
+        <x-input-label for="otp" :value="__('Pilih Kamera')" />
+        <select id="selectCamera" class="mt-1 block w-full rounded-lg border-gray-300 text-gray-700 sm:text-sm">
+            <option hidden>Pilih Kamera</option>
+        </select>
+    </div>
     <div id="reader"></div>
 </section>
 
@@ -177,14 +193,45 @@ new class extends Component {
     
     const config = { 
         fps: 6,
-        qrbox: {width: 200, height: 200},
+        qrbox: {width: 220, height: 220},
         disableFlip: true,
     }
 
     const html5QrCode = new Html5Qrcode("reader");
     let target = document.querySelector('#reader');
+    var select = document.querySelector('#selectCamera');
     // console.log(html5QrCode.getState());
-    Livewire.on('camera-start', async () => {
+
+    select.addEventListener('change', function(value){
+        // console.log(this.value);
+        Livewire.dispatch('select-camera', {cameraId:this.value});
+    });
+
+    // This method will trigger user permissions
+    Html5Qrcode.getCameras().then(devices => {
+        /**
+         * devices would be an array of objects of type:
+         * { id: "id", label: "label" }
+         */
+        // console.log(devices);
+        devices.forEach(async(items)=> {
+            var options = document.createElement('option');
+            // console.log(items);
+            options.text = items.label;
+            options.value = items.id;
+            await select.appendChild(options)
+            
+        });
+        // if (devices && devices.length) {
+        //     var cameraId = devices[0].id;
+        //     // .. use this to start scanning.
+        // }
+        }).catch(err => {
+        // handle err
+        console.warn(err);
+    });
+
+    Livewire.on('camera-start', async ({cameraId}) => {
         // let otpForm = otp.otp;
         @this.stateCamera = true;
         
@@ -215,10 +262,10 @@ new class extends Component {
         const qrCodeErrorCallback = (error) => {
             console.warn(`Code scan error = ${error}`);
         };
-
         // if(html5QrCode.getState() == 1){
             // html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
-            html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
+            // html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
+            html5QrCode.start({ deviceId: { exact: cameraId} }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
             // console.log('status kamera setelah 1 ' + html5QrCode.getState());
         // }else{
         //     html5QrCode.pause(true);
