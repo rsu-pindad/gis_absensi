@@ -50,10 +50,8 @@ new class extends Component {
     #[Renderless]
     function selectCamera($cameraId) : void
     {
-        // dd($cameraId);
-        if($this->stateCamera == false){
-            $this->dispatch('camera-start', cameraId:$cameraId);
-        }
+        sleep(1);
+        $this->dispatch('camera-start', cameraId:$cameraId);
     }
 
     #[On('refresh-otp')]
@@ -90,11 +88,11 @@ new class extends Component {
                 $this->dispatch('info-absen');
                 $this->dispatch('refresh-otp');
                 return $this->alert('info', 'Info', [
-                'position' => 'center',
-                'timer' => '5000',
-                'toast' => true,
-                'text' => 'Terimakasih Anda Sudah Absen di lokasi ini',
-            ]);
+                    'position' => 'center',
+                    'timer' => '5000',
+                    'toast' => true,
+                    'text' => 'Terimakasih Anda Sudah Absen di lokasi ini',
+                ]);
             }
 
             $dinasAbsen = new DinasAbsen;
@@ -116,10 +114,10 @@ new class extends Component {
             $dinasAbsen->save();
             
             $this->alert('success', 'Absen', [
-            'position' => 'center',
-            'timer' => '5000',
-            'toast' => true,
-            'text' => 'Berhasil Absen',
+                'position' => 'center',
+                'timer' => '5000',
+                'toast' => true,
+                'text' => 'Berhasil Absen',
             ]);
             $this->dispatch('info-absen');
             $this->dispatch('refresh-otp');
@@ -200,53 +198,35 @@ new class extends Component {
     const html5QrCode = new Html5Qrcode("reader");
     let target = document.querySelector('#reader');
     var select = document.querySelector('#selectCamera');
-    // console.log(html5QrCode.getState());
+    console.log(html5QrCode.getState());
 
     select.addEventListener('change', function(value){
-        // console.log(this.value);
-        @this.stateCamera = true;
         Livewire.dispatch('select-camera', {cameraId:this.value});
     });
 
-    // This method will trigger user permissions
     Html5Qrcode.getCameras().then(devices => {
-        /**
-         * devices would be an array of objects of type:
-         * { id: "id", label: "label" }
-         */
-        // console.log(devices);
         devices.forEach(async(items)=> {
             var options = document.createElement('option');
-            // console.log(items);
             options.text = items.label;
             options.value = items.id;
             await select.appendChild(options)
-            
         });
-        // if (devices && devices.length) {
-        //     var cameraId = devices[0].id;
-        //     // .. use this to start scanning.
-        // }
-        }).catch(err => {
-        // handle err
+    }).catch(err => {
         console.warn(err);
     });
 
     Livewire.on('camera-start', async ({cameraId}) => {
         // let otpForm = otp.otp;
-        @this.stateCamera = true;
-        
         target.setAttribute('class', 'my-6 size-full md:size-auto rounded border-8');
-
         const qrCodeSuccessCallback = (decodedText, decodedResult) => {
             // console.log(`Code matched = ${decodedText}`, decodedResult);
             // console.log(decodedResult);    
             let otpForm = @this.otp; 
-            console.log('Form OTP ' + otpForm);
+            // console.log('Form OTP ' + otpForm);
             @this.informasiUser = decodedText;
             let userOtp = JSON.parse(decodedText);
             let state = validasiOtp(otpForm,userOtp.otp);
-            console.log('QR OTP ' + userOtp.otp);
+            // console.log('QR OTP ' + userOtp.otp);
             html5QrCode.pause(true);
             if(state === false){
                 setTimeout(() => {
@@ -259,20 +239,27 @@ new class extends Component {
             }
             // Livewire.dispatch('simpan-absensi');
         };
-
         const qrCodeErrorCallback = (error) => {
             console.warn(`Code scan error = ${error}`);
         };
-        // if(html5QrCode.getState() == 1){
-            // html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
-            // html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
-            html5QrCode.start({ deviceId: { exact: cameraId} }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
-            // console.log('status kamera setelah 1 ' + html5QrCode.getState());
-        // }else{
-        //     html5QrCode.pause(true);
-        //     await html5QrCode.stop();
-        //     await html5QrCode.clear();
-        //     console.log('status kamera selain 1 ' + html5QrCode.getState());
+        // if(html5QrCode.getState()){
+        if(html5QrCode.getState() != 1){
+            html5QrCode.stop().then((ignore) => {
+                // alert('camera stopped')
+                console.log('camera stopped');
+            }).catch((err) => {
+                console.warn(err);
+            });
+            html5QrCode.clear();
+        }
+        html5QrCode.start({ deviceId: { exact: cameraId} }, config, qrCodeSuccessCallback, qrCodeErrorCallback);
+        // }else{ 
+        //     html5QrCode.stop().then((ignore) => {
+        //         console.log(ignore);
+        //     }).catch((err) => {
+        //         console.warn(err);
+        //     });
+        //     html5QrCode.clear();
         // }
         
     });
