@@ -204,6 +204,7 @@ new class extends Component {
 
     select.addEventListener('change', function(value){
         // console.log(this.value);
+        $this.stateCamera = true;
         Livewire.dispatch('select-camera', {cameraId:this.value});
     });
 
