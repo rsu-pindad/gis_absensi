@@ -13,8 +13,32 @@ new #[Layout('layouts.guest')] class extends Component
 {
     public string $npp = '';
     public string $email = '';
+    public string $no_hp = '';
     public string $password = '';
     public string $password_confirmation = '';
+
+    public function rules()
+    {
+        return [
+            'npp' => ['required', 'string','size:5','unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'no_hp' => ['required','string', 'unique:'.User::class],
+            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+        ];
+    }
+
+    public function mount()
+    {
+        if (old('npp')) {
+	    $this->npp = old('npp');
+        }
+        if (old('email')) {
+	    $this->npp = old('email');
+        }
+        if (old('no_hp')) {
+	    $this->npp = old('no_hp');
+        }
+    }
 
     /**
      * Handle an incoming registration request.
@@ -22,8 +46,9 @@ new #[Layout('layouts.guest')] class extends Component
     public function register(): void
     {
         $validated = $this->validate([
-            'npp' => ['required', 'string','size:5'],
+            'npp' => ['required', 'string','size:5','unique:'.User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'no_hp' => ['required','string', 'unique:'.User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -42,20 +67,27 @@ new #[Layout('layouts.guest')] class extends Component
         <!-- Npp -->
         <div>
             <x-input-label for="npp" :value="__('Npp')" />
-            <x-text-input wire:model="npp" id="npp" class="block mt-1 w-full" type="text" name="npp" required autofocus autocomplete="npp" />
+            <x-text-input wire:model.blur="npp" id="npp" class="block mt-1 w-full" type="text" name="npp" required autofocus autocomplete="npp" />
             <x-input-error :messages="$errors->get('npp')" class="mt-2" />
         </div>
 
         <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autocomplete="username" />
+            <x-text-input wire:model.blur="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="email" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+
+        <!-- Phone -->
+        <div class="mt-4">
+            <x-input-label for="no_hp" :value="__('No Handphone')" />
+            <x-text-input wire:model.blur="no_hp" id="no_hp" class="block mt-1 w-full" type="tel" name="no_hp" required autofocus autocomplete="no_hp" />
+            <x-input-error :messages="$errors->get('no_hp')" class="mt-2" />
         </div>
 
         <!-- Password -->
         <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <x-input-label for="password" :value="__('Password min:8')" />
 
             <x-text-input wire:model="password" id="password" class="block mt-1 w-full"
                             type="password"
