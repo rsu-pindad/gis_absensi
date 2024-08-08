@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 new class extends Component {
+
     use LivewireAlert;
 
     #[Locked]
@@ -19,31 +20,20 @@ new class extends Component {
     #[Locked]
     public $absensi; 
 
-    #[Validate('required',message: 'Mohon pilih lokasi absen')] 
+    #[Validate('required')] 
     public $selectAbsensi;
 
     #[Validate('required|digits:4')]  
     public $otp;
-
-    public $stateCamera;
+    
+    #[Validate('required')]  
+    public $fingerPrint;
 
     public $informasiUser;
-    public string $token;
 
     function mount()
     {
         $this->absensi = Absensi::with('parentLokasi')->get();
-        $this->stateCamera = false;
-    }
-
-    #[Renderless]
-    function generate() : void
-    {
-        $this->otp = rand(1000, 9999);
-        // $this->dispatch('camera-start', otp:$this->otp);
-        // if($this->stateCamera == false){
-        //     $this->dispatch('camera-start');
-        // }
     }
 
     #[On('select-camera')]
@@ -61,13 +51,49 @@ new class extends Component {
         $this->otp = rand(1000, 9999);
     }
 
-    function checkData($userId,$absensi)
+    function checkData($case, $userId, $absensi, $finger, $devicesIp, $os)
     {
-        $dinasAbsen = DinasAbsen::where(['user_id' => $userId, 'absensi_id' => $absensi])->get();
-        if($dinasAbsen){
-            return false;
+        switch ($case) {
+            case 'checkUserAbsen':
+                $dinasAbsen = DinasAbsen::where(['user_id' => $userId, 'absensi_id' => $absensi])->get();
+                if(count($dinasAbsen) > 0){
+                    return true;
+                }
+                return false;
+            case 'checkFingerPrint':
+                $dinasAbsen = DinasAbsen::where(['absensi_id' => $absensi, 'fingerprint' => $finger])->get();
+                if(count($dinasAbsen) > 0){
+                    return true;
+                }
+                return false;
+            case 'checkIpUser':
+                $dinasAbsen = DinasAbsen::where(['absensi_id' => $absensi, 'devices_ip' => $devicesIp])->get();
+                if(count($dinasAbsen) > 0){
+                    return true;
+                }
+                return false;
+            case 'checkDeviceOs':
+                $dinasAbsen = DinasAbsen::where(['absensi_id' => $absensi, 'fingerprint' => $finger])->whereJsonContains('informasi_os',$os)->get();
+                if(count($dinasAbsen) > 0){
+                    return true;
+                }
+                return false;
+            default:
+                return false;
         }
-        return true;
+    }
+
+    #[On('info-check')]
+    #[Renderless]
+    function infoCheck($state,$message,$text)
+    {
+        $this->alert($state, $message, [
+            'position' => 'center',
+            'timer' => '5000',
+            'toast' => true,
+            'text' => $text,
+        ]);
+        $this->dispatch('info-absen');
     }
 
     #[On('simpan-absensi')]
@@ -81,18 +107,26 @@ new class extends Component {
         $clientIp = \Request::ip();
         try {
             $this->validate();
-
-            $check = $this->checkData($info->id,$this->selectAbsensi);
-
-            if($check !== true){
-                $this->dispatch('info-absen');
-                $this->dispatch('refresh-otp');
-                return $this->alert('info', 'Info', [
-                    'position' => 'center',
-                    'timer' => '5000',
-                    'toast' => true,
-                    'text' => 'Terimakasih Anda Sudah Absen di lokasi ini',
-                ]);
+            $checkData = false;
+            $checkFingerPrint = false;
+            $checkIpUser = false;
+            $checkDeviceOs = false;
+            // checkData($case, $userId = null, $absensi = null, $finger = null, $devicesIp = null, $os = null)
+            $checkData = $this->checkData('checkUserAbsen',$info->id,$this->selectAbsensi,null,null,null);
+            if($checkData === true){
+                return $this->infoCheck('info','Absen','Anda Sudah Absen di lokasi ini');
+            }
+            $checkFingerPrint = $this->checkData('checkFingerPrint',null,$this->selectAbsensi,$this->fingerPrint,null,null);
+            if($checkFingerPrint === true){
+                return $this->infoCheck('warning','Absen','Gagal Absen 401, perangkat terdapat duplikasi data');
+            }
+            $checkIpUser = $this->checkData('checkIpUser',null,$this->selectAbsensi,null,$clientIp,null);
+            if($checkIpUser === true){
+                return $this->infoCheck('warning','Absen','Gagal Absen 401 & 501, perangkat memiliki ip yang sama');
+            }
+            $checkDeviceOs = $this->checkData('checkDeviceOs',null,$this->selectAbsensi,$this->fingerPrint,null,$info->os);
+            if($checkDeviceOs === true){
+                return $this->infoCheck('warning','Absen','Gagal Absen 401 & 501 & 502, identitass perangkat tedapat duplikasi data');
             }
 
             $dinasAbsen = new DinasAbsen;
@@ -101,6 +135,7 @@ new class extends Component {
                 'petugas_id' => (int)Auth::user()->id,
                 'absensi_id' => (int)$this->selectAbsensi,
                 'otp' => $this->otp,
+                'fingerprint' => $this->fingerPrint,
                 'devices_ip' => $clientIp,
                 'informasi_device' => json_encode($info->device),
                 'informasi_os' => json_encode($info->os),
@@ -113,23 +148,11 @@ new class extends Component {
             $dinasAbsen->fill($data);
             $dinasAbsen->save();
             
-            $this->alert('success', 'Absen', [
-                'position' => 'center',
-                'timer' => '5000',
-                'toast' => true,
-                'text' => 'Berhasil Absen',
-            ]);
             $this->dispatch('info-absen');
             $this->dispatch('refresh-otp');
         } catch (\Throwable $th) {
             //throw $th;
-            $this->alert('warning', 'Terjadi Kesalahan', [
-                'position' => 'center',
-                'timer' => '5000',
-                'toast' => true,
-                'text' => $th->getMessage(),
-            ]);
-            $this->dispatch('info-absen');
+            $this->infoCheck('warning','Terjadi Kesalahan',$th->getMessage());
         }
     }
 
@@ -161,7 +184,7 @@ new class extends Component {
             <x-input-error class="mt-2" :messages="$errors->get('otp')" />
         </div>
         <div class="flex items-center gap-4">
-            <x-primary-button type="button" wire:click="generate">{{ __('Buat OTP') }}</x-primary-button>
+            <x-primary-button type="button" wire:click="refreshOtp">{{ __('Buat OTP') }}</x-primary-button>
         </div>
     </form>
     {{-- <div id="reader" class="w-full my-6"></div> --}}
@@ -177,8 +200,18 @@ new class extends Component {
 @push('modulejs')
 <script type="module">
 
+    const fpPromise = FingerprintJS.load()
+    .then(fp => fp.get())
+    .then(result => {
+        const visitorId = result.visitorId;
+        // console.log(visitorId);
+        return visitorId;
+    });
+    const visitor = await fpPromise; 
+    // console.log(window.navigator);
     function validasiOtp(otpForm,otpQr)
     {
+        @this.fingerPrint = visitor;
         if(parseInt(otpForm) === parseInt(otpQr)){
             return true;
         }
@@ -191,14 +224,14 @@ new class extends Component {
     
     const config = { 
         fps: 6,
-        qrbox: {width: 220, height: 220},
+        qrbox: {width: 240, height: 240},
         disableFlip: true,
     }
 
     const html5QrCode = new Html5Qrcode("reader");
     let target = document.querySelector('#reader');
     var select = document.querySelector('#selectCamera');
-    console.log(html5QrCode.getState());
+    // console.log(html5QrCode.getState());
 
     select.addEventListener('change', function(value){
         Livewire.dispatch('select-camera', {cameraId:this.value});
@@ -220,13 +253,10 @@ new class extends Component {
         target.setAttribute('class', 'my-6 size-full md:size-auto rounded border-8');
         const qrCodeSuccessCallback = (decodedText, decodedResult) => {
             // console.log(`Code matched = ${decodedText}`, decodedResult);
-            // console.log(decodedResult);    
             let otpForm = @this.otp; 
-            // console.log('Form OTP ' + otpForm);
             @this.informasiUser = decodedText;
             let userOtp = JSON.parse(decodedText);
             let state = validasiOtp(otpForm,userOtp.otp);
-            // console.log('QR OTP ' + userOtp.otp);
             html5QrCode.pause(true);
             if(state === false){
                 setTimeout(() => {

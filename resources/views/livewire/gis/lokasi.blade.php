@@ -2,6 +2,7 @@
 
 use Livewire\Volt\Component;
 use App\Models\Lokasi;
+use Livewire\Attributes\Renderless;
 
 new class extends Component 
 {
@@ -21,6 +22,7 @@ new class extends Component
         $this->token = config('app.maps.mapbox_token');
     }
 
+    #[Renderless]
     public function simpanLokasi() : void
     {
         $lokasi = new Lokasi;
@@ -50,45 +52,51 @@ new class extends Component
         </p>
     </header>
 
-    <div id="map" class="w-full h-96 my-6" on="lokasi-simpan">
+    <div class="flex flex-col">
+
+        <div id="map" class="w-full h-96 my-6" on="lokasi-simpan">
+        </div>
+
+        <form wire:submit="simpanLokasi" class="mt-6 space-y-6">
+            <div class="flex gap-4">
+
+                <div class="flex-auto">
+                    <x-input-label for="lotd" :value="__('Longitude')" />
+                    <x-text-input wire:model="lotd" id="lotd" name="lotd" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
+                    <x-input-error class="mt-2" :messages="$errors->get('lotd')" />
+                </div>
+
+                <div class="flex-auto">
+                    <x-input-label for="latd" :value="__('Latitude')" />
+                    <x-text-input wire:model="latd" id="latd" name="latd" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
+                    <x-input-error class="mt-2" :messages="$errors->get('latd')" />
+                </div>
+            </div>
+
+            <div class="flex flex-col">
+                <div class="flex-auto">
+                    <x-input-label for="instansi" :value="__('Instansi')" />
+                    <x-textarea-input wire:model="instansi" id="instansi" name="instansi" class="form-textarea mt-1 block w-full" required />
+                    <x-input-error class="mt-2" :messages="$errors->get('instansi')" />
+                </div>
+                <div class="flex-auto">
+                    <x-input-label for="alamat" :value="__('Alamat')" />
+                    <x-textarea-input wire:model="alamat" id="alamat" name="alamat" class="form-textarea mt-1 block w-full" />
+                    <x-input-error class="mt-2" :messages="$errors->get('alamat')" />
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <x-primary-button>{{ __('Simpan') }}</x-primary-button>
+
+                <x-action-message class="me-3" on="lokasi-simpan">
+                    {{ __('Tersimpan.') }}
+                </x-action-message>
+            </div>
+        </form>
+
     </div>
-    <form wire:submit="simpanLokasi" class="mt-6 space-y-6">
-        <div class="flex gap-4">
-            
-            <div class="flex-auto">
-                <x-input-label for="lotd" :value="__('Longitude')" />
-                <x-text-input wire:model="lotd" id="lotd" name="lotd" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
-                <x-input-error class="mt-2" :messages="$errors->get('lotd')" />
-            </div>
 
-            <div class="flex-auto">
-                <x-input-label for="latd" :value="__('Latitude')" />
-                <x-text-input wire:model="latd" id="latd" name="latd" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
-                <x-input-error class="mt-2" :messages="$errors->get('latd')" />
-            </div>
-        </div>
-
-        <div class="flex flex-col">
-            <div class="flex-auto">
-                <x-input-label for="instansi" :value="__('Instansi')" />
-                <x-textarea-input wire:model="instansi" id="instansi" name="instansi" class="form-textarea mt-1 block w-full" required />
-                <x-input-error class="mt-2" :messages="$errors->get('instansi')" />
-            </div>
-            <div class="flex-auto">
-                <x-input-label for="alamat" :value="__('Alamat')" />
-                <x-textarea-input wire:model="alamat" id="alamat" name="alamat" class="form-textarea mt-1 block w-full" />
-                <x-input-error class="mt-2" :messages="$errors->get('alamat')" />
-            </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Simpan') }}</x-primary-button>
-
-            <x-action-message class="me-3" on="lokasi-simpan">
-                {{ __('Tersimpan.') }}
-            </x-action-message>
-        </div>
-    </form>
 </section>
 
 @push('modulejs')

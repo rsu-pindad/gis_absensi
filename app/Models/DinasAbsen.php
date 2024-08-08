@@ -18,6 +18,7 @@ class DinasAbsen extends Model
         'petugas_id',
         'absensi_id',
         'otp',
+        'fingerprint',
         'devices_ip',
         'informasi_device',
         'informasi_os',

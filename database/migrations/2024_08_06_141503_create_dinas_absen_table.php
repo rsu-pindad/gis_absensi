@@ -15,7 +15,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('petugas_id');
             $table->unsignedBigInteger('absensi_id');
-            $table->string('otp')->nullable();
+            $table->string('otp');
+            $table->text('fingerprint');
             $table->ipAddress('devices_ip')->nullable();
             $table->json('informasi_device')->nullable();
             $table->json('informasi_os')->nullable();

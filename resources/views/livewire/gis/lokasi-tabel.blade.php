@@ -9,19 +9,21 @@ use Livewire\Attribute\Locked;
 new class extends Component {
 
     use WithPagination;
+    
     public $isModalOpen = false;
     public $isModalDelete = false;
     public $isUpdatePage = false;
     public $page = 1;
     public $perPage = 10;
-    public $search = '';
-    public $sortDirection = 'DESC';
-    public $sortColumn = 'created_at';
+    public string $search = '';
+    public string $sortDirection = 'DESC';
+    public string $sortColumn = 'created_at';
     public $confirmDeleteId;
     
     #[Locked]
-    public $title = 'Data GIS';
+    public $title = 'Data Tabel GIS';
 
+    #[On('data-update')]
     public function with() : array
     {
         return [
@@ -93,6 +95,17 @@ new class extends Component {
 
 }; ?>
 
-<section on="lokasi-simpan">
-    <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$lokasi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title"/>
+<section>
+    <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$lokasi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title" />
 </section>
+{{-- 
+@push('modulejs')
+<script type="module">
+
+    Livewire.on('lokasi-simpan',()=> {
+        Livewire.dispatch('data-update');
+        alert('lokasi-simpan')
+    });
+
+</script>
+@endpush --}}

@@ -43,7 +43,7 @@
             </select>
         </div>
 
-        {{ $items->links() }}
+        {{ $items->links(data: ['scrollTo' => false]) }}
        
     </div>
 </div>
