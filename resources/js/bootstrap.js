@@ -30,3 +30,22 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
 //     enabledTransports: ['ws', 'wss'],
 // });
+
+import '/node_modules/mapbox-gl/dist/mapbox-gl.css';
+import '/node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+
+import mapboxgl from 'mapbox-gl';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import {Html5QrcodeScanner} from "html5-qrcode";
+import {Html5Qrcode} from "html5-qrcode";
+import { detect } from 'un-detector';
+import Swal from 'sweetalert2';
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
+
+window.mapboxgl = mapboxgl;
+window.MapboxGeocoder = MapboxGeocoder;
+window.Html5QrcodeScanner = Html5QrcodeScanner;
+window.Html5Qrcode = Html5Qrcode;
+window.detect = detect;
+window.Swal = Swal;
+window.FingerprintJS = FingerprintJS;
