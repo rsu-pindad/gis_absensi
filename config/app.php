@@ -187,7 +187,7 @@ return [
          */
 
         Milon\Barcode\BarcodeServiceProvider::class,
-        Barryvdh\Debugbar\ServiceProvider::class,
+        // Barryvdh\Debugbar\ServiceProvider::class,
 
         /*
          * Application Service Providers...
