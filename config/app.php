@@ -187,6 +187,7 @@ return [
          */
 
         Milon\Barcode\BarcodeServiceProvider::class,
+        Barryvdh\Debugbar\ServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -215,6 +216,7 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
         'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
+        'Vite' => Illuminate\Support\Facades\Vite::class,
     ])->toArray(),
 
     'maps' => [
