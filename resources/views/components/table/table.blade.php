@@ -8,7 +8,8 @@
     'isModalEdit' => false,
     'routeEdit' => null,
     'routeView' => null,
-    'title'
+    'title',
+    'componentEditName' => null,
 ])
 
 <div class="card dark:text-gray-100">
@@ -20,23 +21,25 @@
             Menampilkan <span class="badge badge-secondary" wire:model.live="perPage" id="perPage"> {{ $perPage }}</span> data
         </div>
         <div class="ms-auto text-muted">
-            <x-input-label for="search" :value="__('Cari:')" />
-            <x-text-input wire:model.live.debounce.300ms="search" type="text" aria-label="Cari GIS" />
+            <div class="py-4">
+                <x-input-label for="search" :value="__('Cari:')" />
+                <x-text-input wire:model.live.debounce.500ms="search" type="text" aria-label="cari-data" placeholder="cari data.." class="md:w-full" />
+            </div>
         </div>
         <div class="rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="overflow-x-auto rounded-t-lg">
                 <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-900 datatable">
                     <x-table.table-head :columns="$columns" :sortColumn="$sortColumn" :sortDirection="$sortDirection" />
                     <x-table.table-body :isModalEdit="$isModalEdit" :routeEdit="$routeEdit" :routeView="$routeView" :items="$items" :columns="$columns" :page="$page"
-                        :perPage="$perPage" />
+                        :perPage="$perPage" :componentEditName="$componentEditName" />
                 </table>
             </div>
         </div>
     </div>
     <div class="card-footer d-flex align-items-center">
         <div class="d-flex">
-            <label for="block text-sm font-medium text-gray-900">Per Page</label>
-            <select class="mt-1.5 rounded-lg border-gray-300 text-gray-700 sm:text-sm" wire:model.live="perPage" id="perPage">
+            <x-input-label class="block text-sm font-medium text-gray-900" for="perPage" :value="__('per halaman')" />
+            <select wire:model.live="perPage" id="perPage" class=" border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
