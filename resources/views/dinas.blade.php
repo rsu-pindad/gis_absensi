@@ -12,10 +12,12 @@
                     <livewire:dinas.dinas-form />
                 </div>
             </div>
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                </div>
-            </div>
         </div>
     </div>
+
+    <x-banner-message>
+        <x-slot:pesan>
+            Mohon perlihatkan barcode yang telah dibuat ke Petugas untuk di scan !
+        </x-slot:pesan>
+    </x-banner-message>
 </x-app-layout>
