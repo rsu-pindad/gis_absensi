@@ -34,7 +34,7 @@
                     </div>
                 </header>
             @endif
-
+            @stack('modulecss')
             <!-- Page Content -->
             <main>
                 {{ $slot }}
@@ -42,5 +42,6 @@
         </div>
         @stack('modulejs')
         <x-livewire-alert::scripts />
+        @livewire('wire-elements-modal')
     </body>
 </html>
