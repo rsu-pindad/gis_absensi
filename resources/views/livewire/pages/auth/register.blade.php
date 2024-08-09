@@ -62,11 +62,11 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div>
+<div class="mx-8">
     <form wire:submit="register">
         <!-- Npp -->
         <div>
-            <x-input-label for="npp" :value="__('Npp')" />
+            <x-input-label for="npp" :value="__('Npp fixed:5')" />
             <x-text-input wire:model.blur="npp" id="npp" class="block mt-1 w-full" type="text" name="npp" required autofocus autocomplete="npp" />
             <x-input-error :messages="$errors->get('npp')" class="mt-2" />
         </div>
