@@ -16,6 +16,7 @@ new class extends Component
     }
 }; ?>
 
+{{-- <nav class="top-0 sticky bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700"> --}}
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,7 +25,7 @@ new class extends Component
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" wire:navigate>
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                        <x-application-logo class="object-fill p-5" />
                     </a>
                 </div>
 
@@ -41,6 +42,9 @@ new class extends Component
                     </x-nav-link>
                     <x-nav-link :href="route('presensi')" :active="request()->routeIs('presensi')" wire:navigate=false>
                         {{ __('Presensi') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('user-presensi')" :active="request()->routeIs('user-presensi')" wire:navigate=false>
+                        {{ __('User Presensi') }}
                     </x-nav-link>
                     <x-nav-link :href="route('dinas')" :active="request()->routeIs('dinas')" wire:navigate=false>
                         {{ __('Absensi Dinas') }}

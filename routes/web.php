@@ -33,6 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::view('presensi', 'presensi')
         ->name('presensi');
 
+    Route::view('user-presensi', 'user-presensi')
+        ->name('user-presensi');
+
     Route::view('dinas', 'dinas')
         ->name('dinas');
 
