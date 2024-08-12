@@ -222,5 +222,8 @@ return [
     'maps' => [
         'mapbox_token' => env('MAPBOX_TOKEN', ''),
     ],
+    'fonnte' => [
+        'fonnte_token' => env('FONNTE_TOKEN', ''),
+    ],
 
 ];
