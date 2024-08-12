@@ -34,6 +34,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 import '/node_modules/mapbox-gl/dist/mapbox-gl.css';
 import '/node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import '/node_modules/tom-select/dist/css/tom-select.css';
+import '/node_modules/preline/dist/preline.js';
 
 import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
