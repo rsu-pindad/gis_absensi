@@ -37,10 +37,10 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div class="mt-7 bg-neutral-50 border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
-    <div class="p-4 sm:p-7">
+    <div class="p-4 sm:p-7 flex flex-col items-center justify-center">
         <div class="text-center">
             <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Lupa Password?</h1>
-            <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
+            <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400 text-balance">
                 jangan khawatir, kami hanya memerlukan email anda, tautan pemulihan password akan dikirim melalui email
             </p>
         </div>
