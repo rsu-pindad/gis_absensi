@@ -19,9 +19,15 @@ new class extends Component {
     public string $sortDirection = 'DESC';
     public string $sortColumn = 'created_at';
     public $confirmDeleteId;
+    public $componentEditName = 'gis.lokasi-edit';
     
     #[Locked]
     public $title = 'Data Tabel GIS';
+
+    public static function destroyOnClose(): bool
+    {
+        return true;
+    }
 
     #[On('data-update')]
     public function with() : array
@@ -96,16 +102,5 @@ new class extends Component {
 }; ?>
 
 <section>
-    <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$lokasi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title" />
+    <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$lokasi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title" :componentEditName="json_encode($componentEditName)" />
 </section>
-{{-- 
-@push('modulejs')
-<script type="module">
-
-    Livewire.on('lokasi-simpan',()=> {
-        Livewire.dispatch('data-update');
-        alert('lokasi-simpan')
-    });
-
-</script>
-@endpush --}}

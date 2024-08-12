@@ -80,7 +80,7 @@ new class extends Component {
     <form wire:submit="buatBarcode" class="mt-6 space-y-6">
         <div>
             <x-input-label for="otp" :value="__('OTP')" />
-            <x-text-input wire:model="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required disabled />
+            <x-text-input wire:model="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" placeholder="masukan barcode" required disabled />
             <x-input-error class="mt-2" :messages="$errors->get('otp')" />
         </div>
 
@@ -93,7 +93,7 @@ new class extends Component {
         </div>
     </form>
 
-    <div id="barcodeUsers">
+    <div id="barcodeUsers" class="flex justify-center bg-white mt-4">
     </div>
 
 </section>
@@ -164,9 +164,9 @@ new class extends Component {
     Livewire.on('generated-barcode', async () => {
         getInfo = await @this.resultUser;
         target.innerHTML = '';
-        images.setAttribute('height', 200);
-        images.setAttribute('width', 200);
-        images.setAttribute('class', 'bg-stone-100 my-4 p-4 border-2');
+        // images.setAttribute('height', 200);
+        // images.setAttribute('width', 200);
+        images.setAttribute('class', 'object-fill bg-stone-100 my-4 p-4 border-2');
         images.setAttribute('src', `data:image/png;base64,${getInfo}`);
         target.appendChild(images);
         // console.log(getInfo);

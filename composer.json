@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.1",
         "blade-ui-kit/blade-heroicons": "^2.4",
+        "faisal50x/blade-ionicons": "^1.0",
         "guzzlehttp/guzzle": "^7.2",
         "jantinnerezo/livewire-alert": "^3.0",
         "laravel/framework": "^10.0",
@@ -14,7 +15,8 @@
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.0",
-        "milon/barcode": "^11.0"
+        "milon/barcode": "^11.0",
+        "wire-elements/modal": "^2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",

@@ -2,10 +2,15 @@
 
 use Livewire\Volt\Component;
 use App\Models\Lokasi;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Renderless;
+use Livewire\Attributes\On;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 new class extends Component 
 {
+
+    use LivewireAlert;
 
     public string $lotd = '';
     
@@ -16,6 +21,14 @@ new class extends Component
     public string $alamat = '';
 
     public string $token = '';
+
+    #[Locked]
+    public $id;
+
+    protected $listeners = [
+        'confirmedDelete',
+        'dismissedDelete'
+    ];
 
     public function boot()
     {
@@ -39,6 +52,47 @@ new class extends Component
         $this->dispatch('lokasi-simpan');
     }
 
+    #[On('delete-confirmation')]
+    #[Renderless]
+    public function deleteConfirmation($id)
+    {
+        $this->id = $id;
+        $this->alert('warning', 'Hapus Data', [
+            'position' => 'center',
+            'toast' => true,
+            'showConfirmButton' => true,
+            'onConfirmed' => 'confirmedDelete',
+            'showCancelButton' => true,
+            'onDismissed' => 'dismissedDelete',
+            'cancelButtonText' => 'batal',
+            'text' => 'Anda yakin akan menghapus data ?',
+            'confirmButtonText' => 'hapus',
+        ]);   
+    }
+
+    #[Renderless]
+    public function confirmedDelete()
+    {
+        try {
+            $deleteLokasi = Lokasi::find($this->id);
+            $deleteLokasi->delete();
+            $this->alert('success', 'Hapus Data', [
+                'position' => 'center',
+                'timer' => '5000',
+                'toast' => true,
+                'text' => 'berhasil menghapus data',
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            $this->alert('warning', 'terjadi kesalahan', [
+                'position' => 'center',
+                'timer' => '5000',
+                'toast' => true,
+                'text' => $th->getMessage(),
+            ]);
+        }
+    }
+
 }; ?>
 
 <section>
@@ -46,26 +100,21 @@ new class extends Component
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             {{ __('Tambah GIS') }}
         </h2>
-
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {{ __("Gunakan fitur pencarian, klik didalam map, klik geolokasi untuk mengisi form") }}
         </p>
     </header>
 
     <div class="flex flex-col">
-
-        <div id="map" class="w-full h-96 my-6" on="lokasi-simpan">
+        <div id="map" class="w-full h-80 my-6" on="lokasi-simpan">
         </div>
-
-        <form wire:submit="simpanLokasi" class="mt-6 space-y-6">
+        <form wire:submit="simpanLokasi" class="mt-4 space-y-6">
             <div class="flex gap-4">
-
                 <div class="flex-auto">
                     <x-input-label for="lotd" :value="__('Longitude')" />
                     <x-text-input wire:model="lotd" id="lotd" name="lotd" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
                     <x-input-error class="mt-2" :messages="$errors->get('lotd')" />
                 </div>
-
                 <div class="flex-auto">
                     <x-input-label for="latd" :value="__('Latitude')" />
                     <x-text-input wire:model="latd" id="latd" name="latd" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required readonly />
@@ -73,7 +122,7 @@ new class extends Component
                 </div>
             </div>
 
-            <div class="flex flex-col">
+            <div class="flex flex-col gap-4">
                 <div class="flex-auto">
                     <x-input-label for="instansi" :value="__('Instansi')" />
                     <x-textarea-input wire:model="instansi" id="instansi" name="instansi" class="form-textarea mt-1 block w-full" required />
@@ -94,9 +143,7 @@ new class extends Component
                 </x-action-message>
             </div>
         </form>
-
     </div>
-
 </section>
 
 @push('modulejs')
@@ -106,8 +153,8 @@ new class extends Component
         container: 'map',
         // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
         style: 'mapbox://styles/mapbox/streets-v12'
-        , center: [-79.4512, 43.6568]
-        , zoom: 14
+        , center: [107.646407, -6.924785]
+        , zoom: 15
     });
 
     // Add the control to the map.

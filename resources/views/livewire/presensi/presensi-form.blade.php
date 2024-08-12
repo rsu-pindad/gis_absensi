@@ -150,6 +150,7 @@ new class extends Component {
             
             $this->dispatch('info-absen');
             $this->dispatch('refresh-otp');
+            $this->infoCheck('success','Absen','Absensi Berhasil, '.$info->npp);
         } catch (\Throwable $th) {
             //throw $th;
             $this->infoCheck('warning','Terjadi Kesalahan',$th->getMessage());
@@ -184,13 +185,16 @@ new class extends Component {
             <x-input-error class="mt-2" :messages="$errors->get('otp')" />
         </div>
         <div class="flex items-center gap-4">
+            <x-action-message class="me-3" on="refresh-otp">
+                {{ __('OTP diganti.') }}
+            </x-action-message>
             <x-primary-button type="button" wire:click="refreshOtp">{{ __('Buat OTP') }}</x-primary-button>
         </div>
     </form>
     {{-- <div id="reader" class="w-full my-6"></div> --}}
     <div class="mt-6">
-        <x-input-label for="otp" :value="__('Pilih Kamera')" />
-        <select id="selectCamera" class="mt-1 block w-full rounded-lg border-gray-300 text-gray-700 sm:text-sm">
+        <x-input-label for="selectCamera" :value="__('Pilih Kamera')" />
+        <select id="selectCamera" class="w-full bg-neutral-200 border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
             <option hidden>Pilih Kamera</option>
         </select>
     </div>

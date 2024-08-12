@@ -18,9 +18,15 @@ new class extends Component {
     public $sortDirection = 'DESC';
     public $sortColumn = 'created_at';
     public $confirmDeleteId;
+    public $componentEditName = 'absen.absensi-edit';
 
     #[Locked]
     public $title = 'Data Absensi';
+
+    public static function destroyOnClose(): bool
+    {
+        return true;
+    }
 
     public function with() : array
     {
@@ -78,5 +84,5 @@ new class extends Component {
 }; ?>
 
 <section on="absensi-simpan">
-    <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$absensi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title"/>
+    <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$absensi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title" :componentEditName="json_encode($componentEditName)" />
 </section>

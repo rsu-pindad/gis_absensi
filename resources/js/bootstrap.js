@@ -33,14 +33,17 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 import '/node_modules/mapbox-gl/dist/mapbox-gl.css';
 import '/node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import '/node_modules/tom-select/dist/css/tom-select.css';
+import '/node_modules/preline/dist/preline.js';
 
 import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import {Html5QrcodeScanner} from "html5-qrcode";
-import {Html5Qrcode} from "html5-qrcode";
+import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5Qrcode } from "html5-qrcode";
 import { detect } from 'un-detector';
 import Swal from 'sweetalert2';
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import TomSelect from 'tom-select';
 
 window.mapboxgl = mapboxgl;
 window.MapboxGeocoder = MapboxGeocoder;
@@ -49,3 +52,4 @@ window.Html5Qrcode = Html5Qrcode;
 window.detect = detect;
 window.Swal = Swal;
 window.FingerprintJS = FingerprintJS;
+window.TomSelect = TomSelect;
