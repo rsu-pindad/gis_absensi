@@ -62,8 +62,8 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div class="mt-7 bg-neutral-50 border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
-    <div class="p-4 sm:p-7">
+<div class="mt-10 bg-neutral-50 border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
+    <div class="p-4 sm:p-7 flex flex-col items-center justify-center">
         <div class="text-center">
             <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Daftar</h1>
             <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
@@ -74,7 +74,7 @@ new #[Layout('layouts.guest')] class extends Component
             </p>
         </div>
 
-        <div class="mt-5">
+        <div class="text-center mt-3">
             <!-- Form -->
             <form wire:submit="register">
                 <div class="grid gap-y-4">

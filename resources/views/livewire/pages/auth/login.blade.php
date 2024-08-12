@@ -34,7 +34,7 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div class="m-10 bg-neutral-50 border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
+<div class="mt-10 bg-neutral-50 border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
     <div class="p-4 sm:p-7 flex flex-col items-center justify-center">
         <div class="text-center">
             <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Masuk</h1>
