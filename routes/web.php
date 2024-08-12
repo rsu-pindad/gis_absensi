@@ -14,13 +14,18 @@ use Illuminate\Http\Request;
  * |
  */
 
-Route::view('/', 'welcome');
+// Route::view('/', 'welcome');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+
+    Route::get('/', function(){
+        return redirect()->route('dashboard');
+    });
+
     Route::view('profile', 'profile')
         ->name('profile');
 
@@ -42,11 +47,23 @@ Route::middleware('auth')->group(function () {
     Route::view('finger', 'finger')
         ->name('finger');
 
-    Route::get('/signedabsen/{user}', function(Request $request){
+    Route::get('/signedabsensi/{user}/{otp}', function(Request $request){
         if (! $request->hasValidSignature()) {
             abort(401);
         }
-    })->name('signedabsen');
+        return redirect()->route('dashboard');
+    })->name('signedabsensi')->middleware('signed');
+
+    // Route::get('/playground', function(Request $request){
+    //     // if (! $request->hasValidSignature()) {
+    //     //     abort(401);
+    //     // }
+    //     $idUser = 2;
+    //     $random_string = md5(microtime());
+    //     $otp = rand(1000,9999);
+    //     return URL::temporarySignedRoute('signedabsensi', now()->addHours(1), ['user' => $idUser, 'otp' => $otp], absolute:true);
+    // })->name('playground');
+
 });
 
 require __DIR__ . '/auth.php';
