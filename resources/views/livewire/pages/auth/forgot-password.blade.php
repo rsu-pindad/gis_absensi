@@ -36,26 +36,43 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+<div class="mt-7 bg-neutral-50 border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
+    <div class="p-4 sm:p-7">
+        <div class="text-center">
+            <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Lupa Password?</h1>
+            <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
+                jangan khawatir, kami hanya memerlukan email anda, tautan pemulihan password akan dikirim melalui email
+            </p>
+        </div>
+
+        <div class="mt-5">
+            <x-auth-session-status class="mb-4" :status="session('status')" />
+
+            <!-- Form -->
+            <form wire:submit="sendPasswordResetLink">
+                <div class="grid gap-y-4">
+                    <!-- Form Group -->
+                    <div class="max-w-sm">
+                        <div class="flex justify-between items-center">
+                            <x-input-label for="email" :value="__('Email')" />
+                            <x-input-corner :value="__('isi')" />
+                        </div>
+                        <div class="relative">
+                            <x-text-input wire:model="email" id="email" class="mt-1 py-3 px-4 ps-11" type="email" name="email" placeholder="pegawai@pindadmedika.com" required autocomplete="email" />
+                            <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-4">
+                                <x-ionicon-mail-outline class="w-5 h-auto dark:text-neutral-400" />
+                            </div>
+                        </div>
+                        <x-input-error :messages="$errors->get('email')" class="px-4 mt-2" />
+                    </div>
+                    <!-- End Form Group -->
+
+                    <button type="submit" class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                        Reset password
+                    </button>
+                </div>
+            </form>
+            <!-- End Form -->
+        </div>
     </div>
-
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form wire:submit="sendPasswordResetLink">
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
-    </form>
 </div>

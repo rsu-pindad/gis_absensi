@@ -150,7 +150,7 @@ new class extends Component {
             
             $this->dispatch('info-absen');
             $this->dispatch('refresh-otp');
-            return $this->infoCheck('success','Absen','Absensi Berhasil, '.$info->npp);
+            $this->infoCheck('success','Absen','Absensi Berhasil, '.$info->npp);
         } catch (\Throwable $th) {
             //throw $th;
             $this->infoCheck('warning','Terjadi Kesalahan',$th->getMessage());
@@ -194,7 +194,7 @@ new class extends Component {
     {{-- <div id="reader" class="w-full my-6"></div> --}}
     <div class="mt-6">
         <x-input-label for="selectCamera" :value="__('Pilih Kamera')" />
-        <select id="selectCamera" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
+        <select id="selectCamera" class="w-full bg-neutral-200 border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
             <option hidden>Pilih Kamera</option>
         </select>
     </div>

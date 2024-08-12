@@ -24,6 +24,11 @@ new class extends Component {
     #[Locked]
     public $title = 'Data Tabel GIS';
 
+    public static function destroyOnClose(): bool
+    {
+        return true;
+    }
+
     #[On('data-update')]
     public function with() : array
     {

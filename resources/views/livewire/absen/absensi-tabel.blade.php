@@ -23,6 +23,11 @@ new class extends Component {
     #[Locked]
     public $title = 'Data Absensi';
 
+    public static function destroyOnClose(): bool
+    {
+        return true;
+    }
+
     public function with() : array
     {
         return [
@@ -79,5 +84,5 @@ new class extends Component {
 }; ?>
 
 <section on="absensi-simpan">
-    <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$absensi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title" :componentEditName="json_encode($componentEditName)"  />
+    <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$absensi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title" :componentEditName="json_encode($componentEditName)" />
 </section>

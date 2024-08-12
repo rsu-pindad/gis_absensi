@@ -52,18 +52,6 @@ new class extends Component
         $this->dispatch('lokasi-simpan');
     }
 
-    #[On('info-update')]
-    #[Renderless]
-    public function infoUpdate($state, $message, $text)
-    {
-        $this->alert($state, $message, [
-            'position' => 'center',
-            'timer' => '5000',
-            'toast' => true,
-            'text' => $text,
-        ]);   
-    }
-
     #[On('delete-confirmation')]
     #[Renderless]
     public function deleteConfirmation($id)
@@ -112,18 +100,15 @@ new class extends Component
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             {{ __('Tambah GIS') }}
         </h2>
-
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {{ __("Gunakan fitur pencarian, klik didalam map, klik geolokasi untuk mengisi form") }}
         </p>
     </header>
 
     <div class="flex flex-col">
-
         <div id="map" class="w-full h-80 my-6" on="lokasi-simpan">
         </div>
-
-        <form wire:submit="simpanLokasi" class="mt-6 space-y-6">
+        <form wire:submit="simpanLokasi" class="mt-4 space-y-6">
             <div class="flex gap-4">
                 <div class="flex-auto">
                     <x-input-label for="lotd" :value="__('Longitude')" />
@@ -158,9 +143,7 @@ new class extends Component
                 </x-action-message>
             </div>
         </form>
-
     </div>
-
 </section>
 
 @push('modulejs')
@@ -170,8 +153,8 @@ new class extends Component
         container: 'map',
         // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
         style: 'mapbox://styles/mapbox/streets-v12'
-        , center: [-79.4512, 43.6568]
-        , zoom: 14
+        , center: [107.646407, -6.924785]
+        , zoom: 15
     });
 
     // Add the control to the map.

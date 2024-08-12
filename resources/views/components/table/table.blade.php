@@ -12,7 +12,7 @@
     'componentEditName' => null,
 ])
 
-<div class="card dark:text-gray-100">
+<div class="card dark:text-neutral-100">
     <div class="card-header">
         <h3 class="card-title">{{ $title }}</h3>
     </div>
@@ -28,7 +28,7 @@
         </div>
         <div class="rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="overflow-x-auto rounded-t-lg">
-                <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-900 datatable">
+                <table class="min-w-full divide-y-2 divide-gray-200 bg-neutral-100 text-sm dark:divide-gray-700 dark:bg-neutral-900 datatable">
                     <x-table.table-head :columns="$columns" :sortColumn="$sortColumn" :sortDirection="$sortDirection" />
                     <x-table.table-body :isModalEdit="$isModalEdit" :routeEdit="$routeEdit" :routeView="$routeView" :items="$items" :columns="$columns" :page="$page"
                         :perPage="$perPage" :componentEditName="$componentEditName" />
@@ -39,7 +39,7 @@
     <div class="card-footer d-flex align-items-center">
         <div class="d-flex">
             <x-input-label class="block text-sm font-medium text-gray-900" for="perPage" :value="__('per halaman')" />
-            <select wire:model.live="perPage" id="perPage" class=" border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
+            <select wire:model.live="perPage" id="perPage" class="border-gray-300 dark:border-gray-700 dark:bg-neutral-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
