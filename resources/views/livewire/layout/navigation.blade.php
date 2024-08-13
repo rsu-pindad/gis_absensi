@@ -48,17 +48,33 @@ class extends Component
                     {{ __('Absen') }}
                 </x-nav-link>
                 <div class="hs-dropdown [--strategy:static] md:[--strategy:fixed] [--adaptive:none] [--is-collapse:true] md:[--is-collapse:false] p-3 ps-px sm:px-3 md:py-4">
+                    <button id="hs-dropdown-floating-dark-user-absen" type="button" class="hs-dropdown-toggle flex items-center w-full text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+                        User Absen
+                        <x-ionicon-chevron-down-outline class="hs-dropdown-open:-rotate-180 md:hs-dropdown-open:rotate-0 duration-300 shrink-0 ms-auto md:ms-1 size-4" />
+                    </button>
+                    <div class="hs-dropdown-menu transition-[opacity,margin] duration-[0.1ms] md:duration-[150ms] hs-dropdown-open:opacity-100 opacity-0 md:w-48 hidden z-10 bg-neutral-800 md:shadow-md rounded-lg before:absolute top-full before:-top-5 before:start-0 before:w-full before:h-5" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-floating-dark-user-absen">
+                        <div class="py-1 md:px-1 space-y-1 before:bg-neutral-800/30 before:backdrop-blur-md">
+                            <a class="flex items-center gap-x-3.5 p-2 md:px-3 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" href="{{route('dinas')}}" wire:navigate>
+                             Buat Absen Barcode
+                            </a>
+                            <a class="flex items-center gap-x-3.5 p-2 md:px-3 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" href="#">
+                             Scan Absen Barcode
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hs-dropdown [--strategy:static] md:[--strategy:fixed] [--adaptive:none] [--is-collapse:true] md:[--is-collapse:false] p-3 ps-px sm:px-3 md:py-4">
                     <button id="hs-dropdown-floating-dark" type="button" class="hs-dropdown-toggle flex items-center w-full text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
                         Presensi
                         <x-ionicon-chevron-down-outline class="hs-dropdown-open:-rotate-180 md:hs-dropdown-open:rotate-0 duration-300 shrink-0 ms-auto md:ms-1 size-4" />
                     </button>
                     <div class="hs-dropdown-menu transition-[opacity,margin] duration-[0.1ms] md:duration-[150ms] hs-dropdown-open:opacity-100 opacity-0 md:w-48 hidden z-10 bg-neutral-800 md:shadow-md rounded-lg before:absolute top-full before:-top-5 before:start-0 before:w-full before:h-5" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-floating-dark">
                         <div class="py-1 md:px-1 space-y-1 before:bg-neutral-800/30 before:backdrop-blur-md">
-                            <a class="flex items-center gap-x-3.5 p-2 md:px-3 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" href="{{route('presensi')}}">
-                             Scan Presensi
+                            <a class="flex items-center gap-x-3.5 p-2 md:px-3 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" href="{{route('presensi')}}" wire:navigate>
+                                Scan Presensi
                             </a>
-                            <a class="flex items-center gap-x-3.5 p-2 md:px-3 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" href="{{route('user-presensi')}}">
-                             User Presensi
+                            <a class="flex items-center gap-x-3.5 p-2 md:px-3 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" href="{{route('user-presensi')}}" wire:navigate>
+                                User Presensi
                             </a>
                         </div>
                     </div>
