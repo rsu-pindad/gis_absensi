@@ -38,7 +38,7 @@ new class extends Component {
         // $new = [];
         $informasiUser = $this->information;
         
-        $this->absen = URL::temporarySignedRoute('signedabsen',now()->addHours(1),['user' => Auth::id()], absolute: false);
+        $this->absen = URL::temporarySignedRoute('signedabsensi',now()->addHours(1),['user' => Auth::id(), 'otp' => $this->otp], absolute: true);
         $informasiUser['absen'] = $this->absen; 
         $informasiUser['otp'] = $this->otp; 
         // dd($informasiUser);
@@ -80,7 +80,7 @@ new class extends Component {
     <form wire:submit="buatBarcode" class="mt-6 space-y-6">
         <div>
             <x-input-label for="otp" :value="__('OTP')" />
-            <x-text-input wire:model="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" placeholder="masukan barcode" required disabled />
+            <x-text-input wire:model="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" placeholder="aktifkan lokasi dulu" required disabled />
             <x-input-error class="mt-2" :messages="$errors->get('otp')" />
         </div>
 
@@ -110,6 +110,7 @@ new class extends Component {
     let getInfo;
     let target = document.querySelector('#barcodeUsers');
     let images = document.createElement('img');
+    let barcodeInput = document.querySelector('#otp');
     
     mapboxgl.accessToken = `{{$this->token}}`;
     
@@ -134,6 +135,9 @@ new class extends Component {
             trackUserLocation: true,
             showUserHeading: true
         }).on('geolocate', async(e) => {
+            barcodeInput.placeholder = 'Masukan Barcode';
+            barcodeInput.classList.remove('cursor-not-allowed');
+            barcodeInput.classList.remove('hover:cursor-not-allowed');
             @this.lotd = e.coords.latitude ?? null;
             @this.latd = e.coords.longitude ?? null;
             @this.instansi = null;
