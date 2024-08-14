@@ -7,31 +7,81 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Renderless;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use KMLaravel\GeographicalCalculator\Facade\GeoFacade;
 
 new class extends Component {
+
     use LivewireAlert;
+
+    #[Locked]
+    public string $token;
 
     public $showInputOtp = false;
     public $area;
-    public $selectLokasi;
+    public $jarak = 0;
+
+    // Qrcode Database
     public $urlCode;
     public $statusQr;
-    public $otp;
     public $dataQrUser;
+    
+    // Ambil dari device user
+    public $lotdUser;
+    public $latdUser;
+    public $deviceInformasi;
+    public $osInformasi;
 
-    public function mount()
+    #[Locked]
+    public string $finger;
+
+    #[Validate('required|digits:4')]
+    public $otp;
+
+    public function boot()
     {
-        $this->area = DinasAbsenBarcode::with('parentAbsensi')->where('user_id', Auth::id())->where('fingerprint', null)->get();
-        // $action = Route::currentRouteAction(); 
+        $this->token = config('app.maps.mapbox_token');
     }
 
+    #[Renderless]
     public function prosesAbsensi()
     {
-
+        $idBarcode = $this->dataQrUser->id;
+        $lotdQr = $this->dataQrUser->parentAbsensi->parentLokasi->lotd;
+        $latdQr = $this->dataQrUser->parentAbsensi->parentLokasi->latd;
+        // $area = GeoFacade::setMainPoint([-6.914004, 107.634633])
+        // dd($this->latdUser,$this->lotdUser);
+        $latdUserRound = round((double)$this->latdUser,6);
+        $lotdUserRound = round((double)$this->lotdUser,6);
+        $latdQrRound = round((double)$latdQr,6);
+        $lotdQrRound = round((double)$lotdQr,6);
+        $this->area = GeoFacade::clearResult()->setPoints([
+            [$latdUserRound, $lotdUserRound],
+            [$latdQrRound, $lotdQrRound]
+            ])
+            // ->setPoint([$latdQrRound, $lotdQrRound])
+            ->setOptions(['units' => ['m']])
+            ->getDistance();
+        // dd($this->area);
+        $this->jarak = round($this->area['1-2']['m'],2);
+        // dd($this->jarak);
+        if($this->jarak > 120){
+            return $this->alert('warning', 'Absen', [
+                'position' => 'center',
+                'timer' => '5000',
+                'toast' => true,
+                'text' => 'Absensi Gagal, Anda lokasi absen anda berada '.$this->jarak.' Meter dengan lokasi dinas',
+            ]);
+        }
+        return $this->alert('success', 'Absen', [
+            'position' => 'center',
+            'timer' => '5000',
+            'toast' => true,
+            'text' => 'Absensi Berhasil, Anda lokasi absen anda berada '.$this->jarak.' Meter dengan lokasi dinas',
+        ]);
     }
 
     #[On('check-signed')]
-    public function checkSigned() : void
+    public function checkSigned()
     {
         // return Http::dd()->get($this->urlCode)->status();
         // $response = Http::get($this->urlCode);
@@ -40,7 +90,7 @@ new class extends Component {
         sleep(1);
         if($status !== 200)
         {
-            $this->alert('warning', 'Absen', [
+            return $this->alert('warning', 'Absen', [
                 'position' => 'center',
                 'timer' => '5000',
                 'toast' => true,
@@ -61,47 +111,61 @@ new class extends Component {
 
 }; ?>
 
-<section>
+<section class="mb-10">
 
     @if($showInputOtp)
-    <div class="mt-6">
-        <p>QrCode Valid, Silahkan Masukan OTP</p>
-        <p>
+    <div class="mt-6 text-center">
+        <h3 class="text-xl dark:text-white">
+            QrCode Valid, Silahkan Masukan OTP
+        </h3>
+        <h4 class="text-xl dark:text-white">
             {{$this->dataQrUser->parentAbsensi->parentLokasi->instansi}}
-        </p>
+        </h4>
+    </div>
+    <div class="max-w-2xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+        <div class="bg-white rounded-xl shadow p-4 sm:p-7 dark:bg-neutral-900">
+            <form wire:submit="prosesAbsensi">
+                <div class="mt-2 space-y-3">
+                    <x-input-label for="otp" :value="__('OTP Barcode')" />
+                    <x-text-input wire:model="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-auto focus:cursor-auto hover:cursor-auto" required />
+                    <x-input-error class="mt-2" :messages="$errors->get('otp')" />
+                </div>
+                <div class="mt-5 flex justify-center gap-x-2">
+                    <x-primary-button>{{ __('Absen') }}</x-primary-button>
+        
+                    <x-action-message class="me-3" on="lokasi-simpan">
+                        {{ __('Tersimpan.') }}
+                    </x-action-message>
+                </div>
+            </form>
+        </div>
     </div>
     @endif
-    @if($showInputOtp)
-    <form wire:submit="prosesAbsensi">
-        <div class="flex items-center gap-4">
-            <x-input-label for="otp" :value="__('OTP')" />
-            <x-text-input wire:model="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-auto focus:cursor-auto hover:cursor-auto" required/>
-            <x-input-error class="mt-2" :messages="$errors->get('otp')" />
-        </div>
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Absen') }}</x-primary-button>
-
-            <x-action-message class="me-3" on="lokasi-simpan">
-                {{ __('Tersimpan.') }}
-            </x-action-message>
-        </div>
-    </form>
-    @endif
     @if(!$showInputOtp)
+    <div id="map" class="w-full h-96 my-6 "></div>
     <div class="mt-6">
-        <x-input-label for="selectCamera" :value="__('Pilih Kamera')" />
+        <x-input-label for="selectCamera" :value="__('Scan barcode dengan kamera')" />
         <select id="selectCamera" class="w-full bg-neutral-200 border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
             <option hidden>Pilih Kamera</option>
         </select>
     </div>
+    <div class="py-3 flex items-center uppercase text-sm text-gray-800 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6 dark:text-white dark:before:border-neutral-600 dark:after:border-neutral-600">
+        Atau
+    </div>
+    <div>
+        <x-input-label for="selectCamera" :value="__('Unggah Barcode (.png)')" />
+        <input type="file" id="qr-input-file" class="block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:disabled:opacity-50 file:disabled:pointer-events-none dark:text-neutral-500 dark:file:bg-blue-500 dark:hover:file:bg-blue-400" accept="image/png" capture placeholder="scan file">
+    </div>
     <div id="reader"></div>
-    <p>atau</p>
-    <input type="file" id="qr-input-file" accept="image/png" capture placeholder="scan file">
     @endif
 </section>
 
 @push('modulejs')
 <script type="module">
+
+    const detected = detect(window.navigator.userAgent);
+    const deviceInfo = detected.device;
+    const osInfo = detected.os;
 
     const fpPromise = FingerprintJS.load()
     .then(fp => fp.get())
@@ -109,7 +173,7 @@ new class extends Component {
         const visitorId = result.visitorId;
         return visitorId;
     });
-    const visitor = await fpPromise; 
+    const visitor = await fpPromise;
     // console.log(window.navigator);
     function validasiOtp(otpForm,otpQr)
     {
@@ -215,6 +279,7 @@ new class extends Component {
     }
     
     fileinput.addEventListener('change', e => {
+        e.preventDefault();
         if (e.target.files.length == 0) {
             // No file selected, ignore 
             return;
@@ -237,6 +302,41 @@ new class extends Component {
             html5QrCode.clear();
         });
     });
+
+    let getInfo;
+    let barcodeInput = document.querySelector('#otp');
+
+    mapboxgl.accessToken = `{{$this->token}}`;
+    
+    if(!mapboxgl.supported()){
+        alert('browser (peramban) tidak mendukung maps');
+    }
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [
+                107.60998,
+                -6.919709
+            ],
+        zoom: 15,
+    });
+    map.scrollZoom.disable();
+    map.addControl(
+        new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: false,
+            showUserHeading: true
+        }).on('geolocate', async(e) => {
+            @this.latdUser = e.coords.latitude ?? null;
+            @this.lotdUser = e.coords.longitude ?? null;
+            @this.deviceInformasi = deviceInfo;
+            @this.osInformasi = osInfo;
+            @this.finger = visitor;
+            // Livewire.dispatch('lokasi-didapat');
+        })
+    );
 
 </script>
 @endpush
