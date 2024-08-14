@@ -5,8 +5,9 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Models\DinasAbsenBarcode;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Renderless;
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Http;
+// use Illuminate\Http\Client\Response;
+// use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
 use KMLaravel\GeographicalCalculator\Facade\GeoFacade;
 
 new class extends Component {
@@ -45,11 +46,8 @@ new class extends Component {
     #[Renderless]
     public function prosesAbsensi()
     {
-        $idBarcode = $this->dataQrUser->id;
         $lotdQr = $this->dataQrUser->parentAbsensi->parentLokasi->lotd;
         $latdQr = $this->dataQrUser->parentAbsensi->parentLokasi->latd;
-        // $area = GeoFacade::setMainPoint([-6.914004, 107.634633])
-        // dd($this->latdUser,$this->lotdUser);
         $latdUserRound = round((double)$this->latdUser,6);
         $lotdUserRound = round((double)$this->lotdUser,6);
         $latdQrRound = round((double)$latdQr,6);
@@ -58,26 +56,14 @@ new class extends Component {
             [$latdUserRound, $lotdUserRound],
             [$latdQrRound, $lotdQrRound]
             ])
-            // ->setPoint([$latdQrRound, $lotdQrRound])
             ->setOptions(['units' => ['m']])
             ->getDistance();
-        // dd($this->area);
         $this->jarak = round($this->area['1-2']['m'],2);
         // dd($this->jarak);
-        if($this->jarak > 120){
-            return $this->alert('warning', 'Absen', [
-                'position' => 'center',
-                'timer' => '5000',
-                'toast' => true,
-                'text' => 'Absensi Gagal, Anda lokasi absen anda berada '.$this->jarak.' Meter dengan lokasi dinas',
-            ]);
+        if($this->jarak > 80){
+            return $this->dispatch('info-status','warning','Absen','Absensi Gagal, Anda lokasi absen anda berada '.$this->jarak.' Meter dengan lokasi dinas')->self();
         }
-        return $this->alert('success', 'Absen', [
-            'position' => 'center',
-            'timer' => '5000',
-            'toast' => true,
-            'text' => 'Absensi Berhasil, Anda lokasi absen anda berada '.$this->jarak.' Meter dengan lokasi dinas',
-        ]);
+        return $this->dispatch('valid-area')->self();
     }
 
     #[On('check-signed')]
@@ -103,10 +89,60 @@ new class extends Component {
 
     #[On('select-camera')]
     #[Renderless]
-    function selectCamera($cameraId) : void
+    public function selectCamera($cameraId) : void
     {
         sleep(1);
         $this->dispatch('camera-start', cameraId:$cameraId);
+    }
+
+    #[On('info-status')]
+    #[Renderless]
+    public function infoStatus($state, $info, $text) : void
+    {
+        $this->alert($state, $info, [
+            'position' => 'center',
+            'timer' => '5000',
+            'toast' => true,
+            'text' => $text,
+        ]);
+    }
+
+    #[On('valid-area')]
+    #[Renderless]
+    public function validArea()
+    {
+        try {
+            $dinas = DinasAbsenBarcode::findOrFail($this->dataQrUser->id);
+            if($this->otp !== $dinas->otp_input)
+            {
+                return $this->dispatch('info-status','warning','Absen','Invalid OTP')->self();
+            }
+            if($dinas->fingerprint !== null){
+                return $this->dispatch('info-status','info','Absen','Anda sudah absen masuk')->self();
+            }
+            $dinas->fingerprint = $this->finger;
+            $dinas->devices_ip = \Request::ip();
+            $dinas->informasi_device = json_encode($this->deviceInformasi);
+            $dinas->informasi_os = json_encode($this->osInformasi);
+            $dinas->lotd_user_barcode = $this->lotdUser;
+            $dinas->latd_user_barcode = $this->latdUser;
+            $dinas->updated_at = now();
+            $dinas->save();
+            // $this->dispatch('info-status','success','Absen','Absensi berhasil.. halaman akan otomatis dimuat ulang')->self();
+            $this->alert('success', 'Absen', [
+                'position' => 'center',
+                'timer' => '5000',
+                'toast' => true,
+                'timerProgressBar' => true,
+                'text' => 'Absen berhasil.. halaman otomatis akan dimuat ulang',
+                ]);
+            $this->dispatch('finish-absen');
+            return false;
+            // sleep(5);
+            // return $this->js('location.reload()');
+        } catch (\Throwable $th) {
+            return $this->dispatch('info-status','warning','Absen',$th->getMessage())->self();
+        }
     }
 
 }; ?>
@@ -132,10 +168,9 @@ new class extends Component {
                 </div>
                 <div class="mt-5 flex justify-center gap-x-2">
                     <x-primary-button>{{ __('Absen') }}</x-primary-button>
-        
-                    <x-action-message class="me-3" on="lokasi-simpan">
-                        {{ __('Tersimpan.') }}
-                    </x-action-message>
+                    <button wire:click="$dispatch('batal-absen')" type="button" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-yellow-500 text-white hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 disabled:opacity-50 disabled:pointer-events-none">
+                        Batal
+                    </button>
                 </div>
             </form>
         </div>
@@ -162,11 +197,9 @@ new class extends Component {
 
 @push('modulejs')
 <script type="module">
-
     const detected = detect(window.navigator.userAgent);
     const deviceInfo = detected.device;
     const osInfo = detected.os;
-
     const fpPromise = FingerprintJS.load()
     .then(fp => fp.get())
     .then(result => {
@@ -174,7 +207,44 @@ new class extends Component {
         return visitorId;
     });
     const visitor = await fpPromise;
+    
+    @this.deviceInformasi = deviceInfo;
+    @this.osInformasi = osInfo;
+    @this.finger = visitor;
     // console.log(window.navigator);
+
+    mapboxgl.accessToken = `{{$this->token}}`;
+    
+    if(!mapboxgl.supported()){
+        alert('browser (peramban) tidak mendukung maps');
+    }
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [
+                107.60998,
+                -6.919709
+            ],
+        zoom: 15,
+    });
+
+    map.scrollZoom.disable();
+
+    map.addControl(
+        new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: false,
+            showUserHeading: true
+        }).on('geolocate', async(e) => {
+            @this.latdUser = e.coords.latitude ?? null;
+            @this.lotdUser = e.coords.longitude ?? null;
+            // Livewire.dispatch('lokasi-didapat');
+        })
+    );
+    
     function validasiOtp(otpForm,otpQr)
     {
         @this.fingerPrint = visitor;
@@ -184,7 +254,8 @@ new class extends Component {
         return false;
     }
 
-    async function simpanAbsensi(){
+    async function simpanAbsensi()
+    {
         Livewire.dispatch('simpan-absensi');
     }
     
@@ -303,40 +374,16 @@ new class extends Component {
         });
     });
 
-    let getInfo;
-    let barcodeInput = document.querySelector('#otp');
-
-    mapboxgl.accessToken = `{{$this->token}}`;
-    
-    if(!mapboxgl.supported()){
-        alert('browser (peramban) tidak mendukung maps');
-    }
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [
-                107.60998,
-                -6.919709
-            ],
-        zoom: 15,
+    Livewire.on('finish-absen', () => {
+        html5QrCode.clear();
+        setTimeout(() => {
+            location.reload();
+        }, 5500);
     });
-    map.scrollZoom.disable();
-    map.addControl(
-        new mapboxgl.GeolocateControl({
-            positionOptions: {
-                enableHighAccuracy: true
-            },
-            trackUserLocation: false,
-            showUserHeading: true
-        }).on('geolocate', async(e) => {
-            @this.latdUser = e.coords.latitude ?? null;
-            @this.lotdUser = e.coords.longitude ?? null;
-            @this.deviceInformasi = deviceInfo;
-            @this.osInformasi = osInfo;
-            @this.finger = visitor;
-            // Livewire.dispatch('lokasi-didapat');
-        })
-    );
+    Livewire.on('batal-absen', () => {
+        html5QrCode.clear();
+        location.reload();
+    });
 
 </script>
 @endpush
