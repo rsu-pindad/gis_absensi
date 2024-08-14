@@ -15,6 +15,8 @@ new class extends Component
     
     public string $email = '';
 
+    public string $no_hp = '';
+
     /**
      * Mount the component.
      */
@@ -22,6 +24,7 @@ new class extends Component
     {
         $this->npp = Auth::user()->npp;
         $this->email = Auth::user()->email;
+        $this->no_hp = Auth::user()->no_hp;
     }
 
     /**
@@ -33,6 +36,7 @@ new class extends Component
 
         $validated = $this->validate([
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'no_hp' => ['required', 'string', Rule::unique(User::class)->ignore($user->id)],
         ]);
 
         $user->fill($validated);
@@ -79,8 +83,13 @@ new class extends Component
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
         <div>
             <x-input-label for="npp" :value="__('Npp')" />
-            <x-text-input wire:model="npp" id="npp" name="npp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required autofocus disabled autocomplete="npp" />
+            <x-text-input wire:model="npp" id="npp" name="npp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" required disabled autocomplete="npp" />
             <x-input-error class="mt-2" :messages="$errors->get('npp')" />
+        </div>
+        <div>
+            <x-input-label for="no_hp" :value="__('No HP')" />
+            <x-text-input wire:model="no_hp" id="no_hp" name="no_hp" type="tel" class="mt-1 block w-full cursor-auto focus:cursor-auto hover:cursor-auto" required autocomplete="no_hp" />
+            <x-input-error class="mt-2" :messages="$errors->get('no_hp')" />
         </div>
 
         <div>
