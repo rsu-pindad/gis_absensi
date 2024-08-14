@@ -57,7 +57,7 @@ class extends Component
                             <a class="flex items-center gap-x-3.5 p-2 md:px-3 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" href="{{route('dinas')}}" wire:navigate>
                              Buat Absen Barcode
                             </a>
-                            <a class="flex items-center gap-x-3.5 p-2 md:px-3 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" href="#">
+                            <a class="flex items-center gap-x-3.5 p-2 md:px-3 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:text-gray-700" href="{{route('dinas-scan')}}">
                              Scan Absen Barcode
                             </a>
                         </div>

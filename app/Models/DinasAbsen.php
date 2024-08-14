@@ -25,8 +25,10 @@ class DinasAbsen extends Model
         // 'informasi_os->name',
         // 'informasi_os->version',
         // 'position->lotd',
-        // 'position->lotd',
-        'position',
+        // 'position->latd',
+        // 'position',
+        'lotd_user',
+        'latd_user',
         'presensi_masuk',
         'presensi_keluar'
     ];

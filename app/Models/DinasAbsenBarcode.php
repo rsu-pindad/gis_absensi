@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -24,7 +25,9 @@ class DinasAbsenBarcode extends Model
         'devices_ip',
         'informasi_device',
         'informasi_os',
-        'position',
+        // 'position',
+        'lotd_user_barcode',
+        'latd_user_barcode',
         'presensi_masuk',
         'presensi_keluar'
     ];
@@ -34,4 +37,9 @@ class DinasAbsenBarcode extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function parentAbsensi(): BelongsTo
+    {
+        return $this->belongsTo(Absensi::class, 'absensi_id', 'id');
+    }
 }

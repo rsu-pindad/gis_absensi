@@ -139,10 +139,12 @@ new class extends Component {
                 'devices_ip' => $clientIp,
                 'informasi_device' => json_encode($info->device),
                 'informasi_os' => json_encode($info->os),
-                'position' => json_encode([
-                    'lotd' => $info->lotd,
-                    'latd' => $info->latd,
-                ]),
+                // 'position' => json_encode([
+                //     'lotd' => $info->lotd,
+                //     'latd' => $info->latd,
+                // ]),
+                'lotd_user' => $info->lotd,
+                'latd_user' => $info->latd,
                 'presensi_masuk' => now(),
             ];
             $dinasAbsen->fill($data);

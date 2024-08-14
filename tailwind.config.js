@@ -12,6 +12,9 @@ export default {
     ],
     darkMode: 'class',
     theme: {
+        container: {
+            center: true,
+        },
         // colors: {
         //     'blue': '#1fb6ff',
         //     'purple': '#7e5bef',
