@@ -151,7 +151,7 @@ new class extends Component {
             $dinasAbsen->save();
             
             $this->dispatch('info-absen');
-            $this->dispatch('refresh-otp');
+            // $this->dispatch('refresh-otp');
             $this->infoCheck('success','Absen','Absensi Berhasil, '.$info->npp);
         } catch (\Throwable $th) {
             //throw $th;
