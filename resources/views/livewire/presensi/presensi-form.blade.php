@@ -139,17 +139,19 @@ new class extends Component {
                 'devices_ip' => $clientIp,
                 'informasi_device' => json_encode($info->device),
                 'informasi_os' => json_encode($info->os),
-                'position' => json_encode([
-                    'lotd' => $info->lotd,
-                    'latd' => $info->latd,
-                ]),
+                // 'position' => json_encode([
+                //     'lotd' => $info->lotd,
+                //     'latd' => $info->latd,
+                // ]),
+                'lotd_user' => $info->lotd,
+                'latd_user' => $info->latd,
                 'presensi_masuk' => now(),
             ];
             $dinasAbsen->fill($data);
             $dinasAbsen->save();
             
             $this->dispatch('info-absen');
-            $this->dispatch('refresh-otp');
+            // $this->dispatch('refresh-otp');
             $this->infoCheck('success','Absen','Absensi Berhasil, '.$info->npp);
         } catch (\Throwable $th) {
             //throw $th;

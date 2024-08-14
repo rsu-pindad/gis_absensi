@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('lokasi', function (Blueprint $table) {
             $table->id();
-            $table->string('lotd');
-            $table->string('latd');
+            $table->double('lotd');
+            $table->double('latd');
             $table->text('instansi');
             $table->text('alamat')->nullable();
             $table->softDeletes();

@@ -12,9 +12,9 @@ new class extends Component
 
     use LivewireAlert;
 
-    public string $lotd = '';
+    public $lotd;
     
-    public string $latd = '';
+    public $latd;
     
     public string $instansi = '';
 
@@ -187,8 +187,8 @@ new class extends Component
             // console.log(e.coords.latitude);
             // console.log(e.coords.longitude);
             
-            @this.lotd = e.coords.latitude ?? null;
-            @this.latd = e.coords.longitude ?? null;
+            @this.latd = e.coords.latitude ?? null;
+            @this.lotd = e.coords.longitude ?? null;
             @this.instansi = null
             @this.alamat = null
         })

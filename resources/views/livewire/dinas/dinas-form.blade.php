@@ -124,7 +124,7 @@ new class extends Component {
                 107.60998,
                 -6.919709
             ],
-        zoom: 1,
+        zoom: 15,
     });
     map.scrollZoom.disable();
     map.addControl(
@@ -138,8 +138,8 @@ new class extends Component {
             barcodeInput.placeholder = 'Masukan Barcode';
             barcodeInput.classList.remove('cursor-not-allowed');
             barcodeInput.classList.remove('hover:cursor-not-allowed');
-            @this.lotd = e.coords.latitude ?? null;
-            @this.latd = e.coords.longitude ?? null;
+            @this.latd = e.coords.latitude ?? null;
+            @this.lotd = e.coords.longitude ?? null;
             @this.instansi = null;
             @this.alamat = null;
             @this.deviceInformasi = deviceInfo;

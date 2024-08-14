@@ -56,11 +56,11 @@ new class extends Component {
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => array(
-                // 'target' => '08562160039',
-                'target' => $user->no_hp,
-                'message' => 'Halo'.$user->npp.'Qr telah di buat, silahkan gunakan Qr berikut untuk absen',
-                'url' => $url,
-                'filename' => 'Qr Absensi',
+                'target' => '0818831140',
+                // 'target' => $user->no_hp,
+                'message' => 'Halo '.$user->npp.' Qr telah di buat, silahkan gunakan Qr berikut untuk absen '.$url,
+                // 'url' => $url,
+                // 'filename' => 'Qr Absensi',
                 'schedule' => 0,
                 'typing' => false,
                 'delay' => '5',
@@ -69,7 +69,7 @@ new class extends Component {
                 // 'file' => new CURLFile('qr/QR'.$qrData),
             ),
             CURLOPT_HTTPHEADER => array(
-                    'Authorization: C6#6WZUo4NAza-dLJHwt'
+                    'Authorization: '.config('app.fonnte.fonnte_token'),
                 ),
             ));
 
@@ -136,12 +136,12 @@ new class extends Component {
                 $this->dispatch('infoUpdate', state:'warning',message:'terjadi kesalahan', text:$th->getMessage());
                 continue;
             }
-            // try {
-            //     $fonnte = $this->sendQr($value, $buatBarcode['user_barcode_img']);
-            // } catch (\Throwable $th) {
-            //     //throw $th;
-            //      throw $this->dispatch('infoUpdate', state:'warning',message:'terjadi kesalahan', text:$th->getMessage());
-            // }
+            try {
+                $fonnte = $this->sendQr($value, $buatBarcode['user_barcode_img']);
+            } catch (\Throwable $th) {
+                //throw $th;
+                 throw $this->dispatch('infoUpdate', state:'warning',message:'terjadi kesalahan', text:$th->getMessage());
+            }
         }
         try {
             $dinasAbsenBarcode = new DinasAbsenBarcode;

@@ -20,7 +20,8 @@ return new class extends Migration {
             $table->ipAddress('devices_ip')->nullable();
             $table->json('informasi_device')->nullable();
             $table->json('informasi_os')->nullable();
-            $table->json('position')->nullable();
+            $table->double('lotd_user');
+            $table->double('latd_user');
             $table->dateTimeTz('presensi_masuk', $precision = 0)->nullable();
             $table->dateTimeTz('presensi_keluar', $precision = 0)->nullable();
             $table

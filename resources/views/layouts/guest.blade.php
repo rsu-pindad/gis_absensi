@@ -22,8 +22,8 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-neutral-50 dark:bg-neutral-900 antialiased">
-    <header class="relative flex flex-wrap sm:justify-start sm:flex-nowrap w-full bg-neutral-50 text-sm py-3 dark:bg-neutral-900 border-collapse border-b-2 dark:border-neutral-700">
+<body class="h-dvh bg-neutral-50 dark:bg-neutral-900 antialiased">
+    <header class="max-h-[20%] relative flex flex-wrap sm:justify-start sm:flex-nowrap w-full bg-neutral-50 text-sm py-3 dark:bg-neutral-900 border-collapse border-b-2 dark:border-neutral-700">
         <nav class="max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between">
             <div class="flex items-center justify-between">
                 <a class="flex-none text-xl font-semibold dark:text-white focus:outline-none focus:opacity-80" href="{{route('dashboard')}}" aria-label="Brand" wire:navigate>
@@ -40,9 +40,11 @@
             </div>
         </nav>
     </header>
-    <section class="container mx-auto px-6">
-        {{$slot}}
-    </section>
+    <main class="max-h-[80%]">
+        <section class="container mx-auto px-6">
+            {{$slot}}
+        </section>
+    </main>
     @stack('modulejs')
     <x-livewire-alert::scripts />
     <script type="module">
