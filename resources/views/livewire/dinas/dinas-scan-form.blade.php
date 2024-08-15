@@ -78,7 +78,7 @@ new class extends Component {
         $status = $this->statusQr;
         $this->radioTipeAbsen = $this->statusQrJenis;
         sleep(1);
-        if($status !== 200)
+        if($status != 200)
         {
             return $this->alert('warning', 'Absen', [
                 'position' => 'center',
