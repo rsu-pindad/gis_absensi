@@ -226,5 +226,6 @@ return [
     'fonnte' => [
         'fonnte_token' => env('FONNTE_TOKEN', ''),
     ],
+    'seeder_default' => env('SEEDER_DEFAULT',''),
 
 ];
