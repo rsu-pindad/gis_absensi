@@ -36,9 +36,10 @@ new class extends Component {
 
     function mount()
     {
-        $this->lokasi = Lokasi::select(['id','instansi'])->get();
+        $this->lokasi = Lokasi::select(['id','instansi','alamat'])->get();
     }
 
+    #[Renderless]
     public function simpanAbsen()
     {
         try {
@@ -55,7 +56,7 @@ new class extends Component {
             $absensi->selesai =$this->selesai;
             $absensi->save();
             $this->reset(['tanggal','mulai','selesai']);
-            $this->dispatch('absensi-simpan');
+            $this->dispatch('absensi-simpan')->self();
         } catch (ValidationException $e) {
             // throw $e;
             $this->alert('warning', 'terjadi kesalahan', [
@@ -127,8 +128,13 @@ new class extends Component {
     <form wire:submit="simpanAbsen" class="mt-6 space-y-6">
         <div class="grid grid-cols-1 gap-4">
             <div>
-                <x-input-label for="selectLokasi" class="text-sm font-medium text-gray-900" :value="__('Instansi')" />
-                <x-select-input wire:model="selectLokasi" id="selectLokasi" name="selectLokasi" :items="$this->lokasi" :nameValue="$this->selectName" />
+                <x-input-label for="selectLokasi" class="text-sm font-medium text-gray-900" :value="__('Lokasi Instansi')" />
+                <select wire:model="selectLokasi" name="selectLokasi" id="selectLokasi" class="w-full bg-neutral-100 border-gray-300 dark:border-gray-700 dark:bg-neutral-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
+                    <option hidden>Pilih Lokasi</option>
+                    @foreach($this->lokasi as $key)
+                    <option value="{{$key->id}}">{{$key->instansi}} - {{$key->alamat}}</option>
+                    @endforeach
+                </select>
                 <x-input-error class="mt-2" :messages="$errors->get('selectLokasi')" />
             </div>
             <div>
@@ -137,7 +143,7 @@ new class extends Component {
                 <x-input-error class="mt-2" :messages="$errors->get('tanggal')" />
             </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-4">
             <div>
                 <x-input-label for="mulai" class="text-sm font-medium text-gray-900" :value="__('Jam Mulai')" />
                 <x-text-input wire:model="mulai" id="mulai" name="mulai" type="time" class="mt-1 block w-full" required />

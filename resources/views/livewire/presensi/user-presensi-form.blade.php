@@ -45,6 +45,12 @@ new class extends Component {
         try {
             $user = User::select(['id','npp','no_hp'])->findOrFail($user);
             $url = Storage::disk('public')->url('qr/QR'.$qrData.'.png');
+            $target = '';
+            if(config('app.env') == 'production'){
+                $target = $user->no_hp;
+            }else{
+                $target = '0818831140';
+            }
             $curl = curl_init();
             curl_setopt_array($curl, array(
                 CURLOPT_URL => 'https://api.fonnte.com/send',
@@ -56,14 +62,14 @@ new class extends Component {
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => array(
-                'target' => '0818831140',
+                'target' => $target,
                 // 'target' => $user->no_hp,
                 'message' => 'Halo '.$user->npp.' Qr telah di buat, silahkan gunakan Qr berikut untuk absen '.$url,
                 // 'url' => $url,
                 // 'filename' => 'Qr Absensi',
                 'schedule' => 0,
                 'typing' => false,
-                'delay' => '5',
+                'delay' => '15',
                 'countryCode' => '62',
                 // 'file' => $url,
                 // 'file' => new CURLFile('qr/QR'.$qrData),
