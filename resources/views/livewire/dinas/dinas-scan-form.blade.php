@@ -175,8 +175,9 @@ new class extends Component {
             $findDinas->user_barcode_url = $urlAbsen;
             $findDinas->user_barcode_img = $random_string;
             $findDinas->save();
+            $url = Storage::disk('public')->url('qr/QR'.$random_string.'.png');
             try {
-                $this->kirimStatusWa($tipe,$urlAbsen);
+                $this->kirimStatusWa($tipe,$url);
             } catch (\Throwable $th) {
                 return $this->dispatch('info-status','error','QR Wa Out',$th->getMessage())->self();
             }
