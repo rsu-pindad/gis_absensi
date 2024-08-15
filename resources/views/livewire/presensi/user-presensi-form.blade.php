@@ -14,8 +14,6 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 new class extends Component {
 
     use LivewireAlert;
-
-    public $selectName = 'parentLokasi';
     
     #[Validate('required')]
     public $selectAbsensi;
@@ -26,6 +24,8 @@ new class extends Component {
     public $absensi;
 
     public $users;
+
+    public $checkWa = false;
 
     #[Locked]
     public $selectData;
@@ -129,27 +129,28 @@ new class extends Component {
                     'otp_qr' => $buatBarcode['otp_qr'],
                     'otp_input' => $otp_input,
                     'created_at' => now(),
-                    'updated_at' => now(),
                 ];
             } catch (\Throwable $th) {
                 //throw $th;
-                $this->dispatch('infoUpdate', state:'warning',message:'terjadi kesalahan', text:$th->getMessage());
+                $this->dispatch('infoUpdate', state:'error',message:'terjadi kesalahan 01', text:$th->getMessage());
                 continue;
             }
             try {
-                $fonnte = $this->sendQr($value, $buatBarcode['user_barcode_img']);
+                if($this->checkWa){
+                    $fonnte = $this->sendQr($value, $buatBarcode['user_barcode_img']);
+                }
             } catch (\Throwable $th) {
                 //throw $th;
-                 throw $this->dispatch('infoUpdate', state:'warning',message:'terjadi kesalahan', text:$th->getMessage());
+                $this->dispatch('infoUpdate', state:'error',message:'terjadi kesalahan 02', text:$th->getMessage());
+                continue;
             }
         }
         try {
             $dinasAbsenBarcode = new DinasAbsenBarcode;
             $dinasAbsenBarcode->insert($newData);
-            // $dinasAbsenBarcode->save();
             $this->infoUpdate('success','Presensi', 'Presensi berhasil disimpan');
         } catch (\Throwable $th) {
-            $this->infoUpdate('warning','terjadi kesalahan', $th->getMessage());
+            $this->infoUpdate('error','terjadi kesalahan insert error', $th->getMessage());
         }
     }
 
@@ -157,38 +158,68 @@ new class extends Component {
     #[Renderless]
     public function infoUpdate($state, $message, $text) : void
     {
-        $this->alert($state, $message, [
-            'position' => 'center',
-            'timer' => '5000',
-            'toast' => true,
-            'text' => $text,
-        ]);   
+        if($state == 'error'){
+            $this->alert($state, $message, [
+                'position' => 'center',
+                'timer' => false,
+                'toast' => true,
+                'text' => $text,
+            ]); 
+        }else{
+            $this->alert($state, $message, [
+                'position' => 'center',
+                'timer' => '5000',
+                'toast' => true,
+                'text' => $text,
+            ]);   
+        }
     }
 
 }; ?>
 
 <section>
-    <form wire:submit="simpanPresensi" class="flex flex-col mt-6 space-y-6">
-        <div class="flex-auto">
-            <x-input-label for="selectAbsensi" class="text-sm font-medium text-gray-900" :value="__('Instansi')" />
-            <x-select-input wire:model="selectAbsensi" id="selectAbsensi" name="selectAbsensi" :items="$this->absensi" :nameValue="$this->selectName" required />
-            <x-input-error class="mt-2" :messages="$errors->get('selectAbsensi')" />
-        </div>
-        <div class="flex-auto">
-            <x-input-label for="selectUser" :value="__('User')" />
-            <div class="relative">
-                <select wire:model="selectUser" id="selectUser" name="selectUser[]" class="block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600" multiple placeholder="pilih user..." autocomplete="off">
-                </select>
+    <header>
+        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            {{ __('Tambah User Presensi') }}
+        </h2>
+    </header>
+    <div class="flex flex-col">
+        <form wire:submit="simpanPresensi" class="mt-4 space-y-6">
+            <div class="flex-auto">
+                <x-input-label for="selectAbsensi" class="text-sm font-medium text-gray-900" :value="__('Lokasi Dinas Absen')" />
+                <select wire:model="selectAbsensi" id="selectAbsensi" name="selectAbsensi" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600" required>
+                        <option hidden>Pilih Lokasi instansi</option>
+                    @foreach ($this->absensi as $items)
+                        <option value="{{$items->id}}">
+                            {{$items->parentLokasi->instansi}} | {{$items->mulai}} | {{$items->selesai}}
+                        </option>
+                    @endforeach
+                <select>
+                <x-input-error class="mt-2" :messages="$errors->get('selectAbsensi')" />
             </div>
-            <x-input-error class="mt-2" :messages="$errors->get('selectUser')" />
-        </div>
-        <div class="flex items-center gap-4">
-            <x-action-message class="me-3" on="simpanPresensi">
-                {{ __('Presensi disimpan') }}
-            </x-action-message>
-            <x-primary-button type="submit">{{ __('Simpan Presensi') }}</x-primary-button>
-        </div>
-    </form>
+            <div class="flex-auto">
+                <x-input-label for="selectUser" :value="__('User')" />
+                <div class="relative">
+                    <select wire:model="selectUser" id="selectUser" name="selectUser[]" class="block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600" multiple placeholder="pilih user..." autocomplete="off">
+                    </select>
+                </div>
+                <x-input-error class="mt-2" :messages="$errors->get('selectUser')" />
+            </div>
+            <!-- Switch/Toggle -->
+            <div class="hs-tooltip flex items-center">
+                <input wire:model="checkWa" type="checkbox" id="hs-tooltip-example" class="hs-tooltip-toggle relative w-[3.25rem] h-7 p-px bg-gray-100 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-blue-600 checked:border-blue-600 focus:checked:border-blue-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-600
+                before:inline-block before:size-6 before:bg-white checked:before:bg-blue-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-blue-200">
+                <label for="hs-tooltip-example" class="text-sm text-gray-500 ms-3 dark:text-neutral-400">Kirim QRCode via whatsapp</label>
+                <div class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm dark:bg-neutral-700" role="tooltip">
+                Kirim QRCode via whatsapp
+                </div>
+            </div>
+            <!-- End Switch/Toggle -->
+            <div class="flex items-center gap-4">
+                <x-primary-button type="submit">{{ __('Simpan Presensi') }}</x-primary-button>
+            </div>
+        </form>
+    </div>
 </section>
 
 @push('modulecss')

@@ -49,13 +49,26 @@ Route::middleware('auth')->group(function () {
     Route::view('finger', 'finger')
         ->name('finger');
 
+    Route::view('finger-scan', 'finger-scan')
+        ->name('finger-scan');
+
     Route::get('/signedabsensi/{user}/{otp}', function (Request $request) {
         if (!$request->hasValidSignature()) {
-            return response()->json(['status' => 403, 'message' => 'not ok']);
+            return response()->json(['status' => 403, 'message' => 'not ok', 'tipe' => 'masuk']);
         }
+        return response()->json(['status' => 200, 'message' => 'ok', 'tipe' => 'masuk']);
+    })
+    ->name('signedabsensi')
+    ->middleware('signed');
 
-        return response()->json(['status' => 200, 'message' => 'ok']);
-    })->name('signedabsensi')->middleware('signed');
+    Route::get('/signed-absensi-keluar/{user}/{absensi}', function (Request $request) {
+        if (!$request->hasValidSignature()) {
+            return response()->json(['status' => 403, 'message' => 'not ok', 'tipe' => 'keluar']);
+        }
+        return response()->json(['status' => 200, 'message' => 'ok', 'tipe' => 'keluar']);
+    })
+    ->name('signed-absensi-keluar')
+    ->middleware('signed');
 
     // Route::get('/playground', function(Request $request){
     //     // if (! $request->hasValidSignature()) {

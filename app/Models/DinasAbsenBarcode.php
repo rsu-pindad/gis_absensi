@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
@@ -17,19 +18,20 @@ class DinasAbsenBarcode extends Model
         'user_id',
         'petugas_id',
         'absensi_id',
-        'otp_qr',
-        'otp_input',
         'user_barcode_url',
         'user_barcode_img',
+        'otp_qr',
+        'otp_input',
         'fingerprint',
         'devices_ip',
         'informasi_device',
         'informasi_os',
-        // 'position',
-        'lotd_user_barcode',
-        'latd_user_barcode',
-        'presensi_masuk',
-        'presensi_keluar'
+        'lotd_user_barcode_masuk',
+        'latd_user_barcode_masuk',
+        'lotd_user_barcode_keluar',
+        'latd_user_barcode_keluar',
+        'user_masuk',
+        'user_keluar'
     ];
 
     protected $hidden = [
@@ -38,8 +40,38 @@ class DinasAbsenBarcode extends Model
         'deleted_at',
     ];
 
+    // protected $casts = [
+    //     // 'informasi_device' => 'array',
+    //     // 'informasi_os' => AsArrayObject::class,
+    //     'presensi_masuk'  => 'datetime:H:i',
+    //     'presensi_keluar' => 'datetime:H:i',
+    // ];
+
+    public function parentUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function parentPetugas(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'petugas_id', 'id');
+    }
+
     public function parentAbsensi(): BelongsTo
     {
         return $this->belongsTo(Absensi::class, 'absensi_id', 'id');
+    }
+
+    public static function scopeSearch($query, $value)
+    {
+        $query->whereHas('parentUser', function ($query) use ($value) {
+            $query->where('npp', 'like', "%{$value}%");
+        })->whereHas('parentPetugas', function ($query) use ($value) {
+            $query->where('npp', 'like', "%{$value}%");
+        })->whereHas('parentAbsensi', function ($query) use ($value) {
+            $query->whereHas('parentLokasi', function ($query) use ($value) {
+                $query->where('instansi', 'like', "%{$value}%");
+            });
+        });
     }
 }

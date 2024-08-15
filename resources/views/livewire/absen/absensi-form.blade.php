@@ -112,7 +112,7 @@ new class extends Component {
             ]);
         } catch (\Throwable $th) {
             //throw $th;
-            $this->alert('warning', 'terjadi kesalahan', [
+            $this->alert('error', 'terjadi kesalahan', [
                 'position' => 'center',
                 'timer' => '5000',
                 'toast' => true,
@@ -125,30 +125,33 @@ new class extends Component {
 
 <section>
     <form wire:submit="simpanAbsen" class="mt-6 space-y-6">
-        <div>
-            <x-input-label for="selectLokasi" class="text-sm font-medium text-gray-900" :value="__('Instansi')" />
-            <x-select-input wire:model="selectLokasi" id="selectLokasi" name="selectLokasi" :items="$this->lokasi" :nameValue="$this->selectName" />
-            <x-input-error class="mt-2" :messages="$errors->get('selectLokasi')" />
+        <div class="grid grid-cols-1 gap-4">
+            <div>
+                <x-input-label for="selectLokasi" class="text-sm font-medium text-gray-900" :value="__('Instansi')" />
+                <x-select-input wire:model="selectLokasi" id="selectLokasi" name="selectLokasi" :items="$this->lokasi" :nameValue="$this->selectName" />
+                <x-input-error class="mt-2" :messages="$errors->get('selectLokasi')" />
+            </div>
+            <div>
+                <x-input-label for="tanggal" class="text-sm font-medium text-gray-900" :value="__('Tanggal')" />
+                <x-text-input wire:model="tanggal" id="tanggal" name="tanggal" type="date" class="mt-1 block w-full" required />
+                <x-input-error class="mt-2" :messages="$errors->get('tanggal')" />
+            </div>
         </div>
-        <div>
-            <x-input-label for="tanggal" class="text-sm font-medium text-gray-900" :value="__('Tanggal')" />
-            <x-text-input wire:model="tanggal" id="tanggal" name="tanggal" type="date" class="mt-1 block w-full" required />
-            <x-input-error class="mt-2" :messages="$errors->get('tanggal')" />
-        </div>
-        <div>
-            <x-input-label for="mulai" class="text-sm font-medium text-gray-900" :value="__('Jam Mulai')" />
-            <x-text-input wire:model="mulai" id="mulai" name="mulai" type="time" class="mt-1 block w-full" required />
-            <x-input-error class="mt-2" :messages="$errors->get('mulai')" />
-        </div>
-        <div>
-            <x-input-label for="selesai" class="text-sm font-medium text-gray-900" :value="__('Jam Selesai')" />
-            <x-text-input wire:model="selesai" id="selesai" name="selesai" type="time" class="mt-1 block w-full" required />
-            <x-input-error class="mt-2" :messages="$errors->get('selesai')" />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <x-input-label for="mulai" class="text-sm font-medium text-gray-900" :value="__('Jam Mulai')" />
+                <x-text-input wire:model="mulai" id="mulai" name="mulai" type="time" class="mt-1 block w-full" required />
+                <x-input-error class="mt-2" :messages="$errors->get('mulai')" />
+            </div>
+            <div>
+                <x-input-label for="selesai" class="text-sm font-medium text-gray-900" :value="__('Jam Selesai')" />
+                <x-text-input wire:model="selesai" id="selesai" name="selesai" type="time" class="mt-1 block w-full" required />
+                <x-input-error class="mt-2" :messages="$errors->get('selesai')" />
+            </div>
         </div>
         {{-- <div wire:poll.5s="generate">
             {{$this->url}}
         </div> --}}
-
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Simpan') }}</x-primary-button>
 
