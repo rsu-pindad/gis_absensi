@@ -18,12 +18,15 @@ new class extends Component {
     public string $token;
 
     public $showInputOtp = false;
+    public $tipeAbsen = true;
+    public $radioTipeAbsen = 'masuk';
     public $area;
     public $jarak = 0;
 
     // Qrcode Database
     public $urlCode;
     public $statusQr;
+    public $statusQrJenis = 'masuk';
     public $dataQrUser;
     
     // Ambil dari device user
@@ -60,7 +63,7 @@ new class extends Component {
             ->getDistance();
         $this->jarak = round($this->area['1-2']['m'],2);
         // dd($this->jarak);
-        if($this->jarak > 80){
+        if($this->jarak > 100){
             return $this->dispatch('info-status','warning','Absen','Absensi Gagal, Anda lokasi absen anda berada '.$this->jarak.' Meter dengan lokasi dinas')->self();
         }
         return $this->dispatch('valid-area')->self();
@@ -73,6 +76,7 @@ new class extends Component {
         // $response = Http::get($this->urlCode);
         // $data = json_decode($response->body(), true);
         $status = $this->statusQr;
+        $this->radioTipeAbsen = $this->statusQrJenis;
         sleep(1);
         if($status !== 200)
         {
@@ -82,6 +86,9 @@ new class extends Component {
                 'toast' => true,
                 'text' => 'Gagal Absen, invalid signature qrcode',
             ]);
+        }
+        if($this->radioTipeAbsen == 'keluar'){
+            $this->tipeAbsen = false;
         }
         $this->dataQrUser = DinasAbsenBarcode::with('parentAbsensi')->where('user_id', Auth::id())->where('user_barcode_url', $this->urlCode)->first();
         $this->showInputOtp = true;
@@ -113,22 +120,31 @@ new class extends Component {
     {
         try {
             $dinas = DinasAbsenBarcode::findOrFail($this->dataQrUser->id);
-            if($this->otp !== $dinas->otp_input)
-            {
-                return $this->dispatch('info-status','warning','Absen','Invalid OTP')->self();
+            $tipe = false;
+            if($this->radioTipeAbsen == 'masuk'){
+                if($this->otp !== $dinas->otp_input)
+                {
+                    return $this->dispatch('info-status','warning','Absen','Invalid OTP')->self();
+                }
+                if($dinas->fingerprint !== null){
+                    return $this->dispatch('info-status','info','Absen','Anda sudah absen masuk')->self();
+                }
+                $dinas->fingerprint = $this->finger;
+                $dinas->devices_ip = \Request::ip();
+                $dinas->informasi_device = json_encode($this->deviceInformasi);
+                $dinas->informasi_os = json_encode($this->osInformasi);
+                $dinas->lotd_user_barcode_masuk = $this->lotdUser;
+                $dinas->latd_user_barcode_masuk = $this->latdUser;
+                $dinas->user_masuk = now();
+                $dinas->updated_at = now();
+                $dinas->save();
+                $this->dispatch('qrcode-keluar');
+            }else{
+                $dinas->user_keluar = now();
+                $dinas->updated_at = now();
+                $dinas->save();
+                $this->kirimStatusWa($tipe,null);
             }
-            if($dinas->fingerprint !== null){
-                return $this->dispatch('info-status','info','Absen','Anda sudah absen masuk')->self();
-            }
-            $dinas->fingerprint = $this->finger;
-            $dinas->devices_ip = \Request::ip();
-            $dinas->informasi_device = json_encode($this->deviceInformasi);
-            $dinas->informasi_os = json_encode($this->osInformasi);
-            $dinas->lotd_user_barcode = $this->lotdUser;
-            $dinas->latd_user_barcode = $this->latdUser;
-            $dinas->updated_at = now();
-            $dinas->save();
-            // $this->dispatch('info-status','success','Absen','Absensi berhasil.. halaman akan otomatis dimuat ulang')->self();
             $this->alert('success', 'Absen', [
                 'position' => 'center',
                 'timer' => '5000',
@@ -141,14 +157,94 @@ new class extends Component {
             // sleep(5);
             // return $this->js('location.reload()');
         } catch (\Throwable $th) {
-            return $this->dispatch('info-status','warning','Absen',$th->getMessage())->self();
+            return $this->dispatch('info-status','error','Valid Area',$th->getMessage())->self();
         }
     }
+    
+    #[On('qrcode-keluar')]
+    #[Renderless]
+    public function buatQrKeluar()
+    {
+        $random_string = md5(microtime());
+        $tipe = true;
+        try {
+            $findDinas = DinasAbsenBarcode::findOrFail($this->dataQrUser->id);
+            Storage::disk('public')->delete('qr/QR'.$findDinas->user_barcode_img.'.png');
+            $urlAbsen = URL::signedRoute('signed-absensi-keluar', ['user' => Auth::id(), 'absensi' => $findDinas->id], absolute:true);
+            Storage::disk('public')->put('qr/QR'.$random_string.'.png',base64_decode(DNS2D::getBarcodePNG($urlAbsen,'QRCODE')));
+            $findDinas->user_barcode_url = $urlAbsen;
+            $findDinas->user_barcode_img = $random_string;
+            $findDinas->save();
+            try {
+                $this->kirimStatusWa($tipe,$urlAbsen);
+            } catch (\Throwable $th) {
+                return $this->dispatch('info-status','error','QR Wa Out',$th->getMessage())->self();
+            }
+        } catch (\Throwable $th) {
+            return $this->dispatch('info-status','error','QR Out',$th->getMessage())->self();
+        }
+    }
+
+    #[Renderless]
+    public function kirimStatusWa($tipe = true,$urlAbsen = null)
+    {
+        $msg = '';
+        try {
+            if($tipe){
+                $msg = 'Halo '.Auth::user()->npp.' Terimakasih Absensi berhasil di catat, gunakan tautan berikut untuk absen keluar '.$urlAbsen;
+            }else{
+                $msg = 'Halo '.Auth::user()->npp.' Terimakasih Absensi keluar berhasil di catat';
+            }
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.fonnte.com/send',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => array(
+                'target' => '0818831140',
+                // 'target' => $user->no_hp,
+                'message' => $msg,
+                // 'url' => $url,
+                // 'filename' => 'Qr Absensi',
+                'schedule' => 0,
+                'typing' => false,
+                'delay' => '5',
+                'countryCode' => '62',
+                // 'file' => $url,
+                // 'file' => new CURLFile('qr/QR'.$qrData),
+            ),
+            CURLOPT_HTTPHEADER => array(
+                    'Authorization: '.config('app.fonnte.fonnte_token'),
+                ),
+            ));
+
+            $response = curl_exec($curl);
+            if (curl_errno($curl)) {
+                $error_msg = curl_error($curl);
+            }
+            curl_close($curl);
+
+            if (isset($error_msg)) {
+                return $error_msg;
+            }
+            return $response;
+        } catch (\Throwable $th) {
+            //throw $th;
+            return $th->getMessage();
+        }   
+    }
+
 
 }; ?>
 
 <section class="mb-10">
 
+    <div id="map" class="w-full h-96 my-6 "></div>
     @if($showInputOtp)
     <div class="mt-6 text-center">
         <h3 class="text-xl dark:text-white">
@@ -161,12 +257,26 @@ new class extends Component {
     <div class="max-w-2xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
         <div class="bg-white rounded-xl shadow p-4 sm:p-7 dark:bg-neutral-900">
             <form wire:submit="prosesAbsensi">
-                <div class="mt-2 space-y-3">
+                <div class="mt-3 grid sm:grid-cols-2 gap-2">
+                    <x-input-label for="hs-radio-in-form" :value="__('Jenis Absen')" />
+                    @if($tipeAbsen)
+                    <label for="hs-radio-in-form" class="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+                      <input wire:model="radioTipeAbsen" checked value="masuk" type="radio" name="hs-radio-in-form" class="shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800">
+                      <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400">Masuk</span>
+                    </label>
+                    @else
+                    <label for="hs-radio-in-form" class="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+                      <input wire:model="radioTipeAbsen" checked value="keluar" type="radio" name="hs-radio-in-form" class="shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800">
+                      <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400">Keluar</span>
+                    </label>
+                    @endif
+                  </div>
+                <div class="mt-3 space-y-3">
                     <x-input-label for="otp" :value="__('OTP Barcode')" />
                     <x-text-input wire:model="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-auto focus:cursor-auto hover:cursor-auto" required />
                     <x-input-error class="mt-2" :messages="$errors->get('otp')" />
                 </div>
-                <div class="mt-5 flex justify-center gap-x-2">
+                <div class="mt-3 flex justify-center gap-x-2">
                     <x-primary-button>{{ __('Absen') }}</x-primary-button>
                     <button wire:click="$dispatch('batal-absen')" type="button" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-yellow-500 text-white hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 disabled:opacity-50 disabled:pointer-events-none">
                         Batal
@@ -177,19 +287,18 @@ new class extends Component {
     </div>
     @endif
     @if(!$showInputOtp)
-    <div id="map" class="w-full h-96 my-6 "></div>
-    <div class="mt-6">
+    <div>
         <x-input-label for="selectCamera" :value="__('Scan barcode dengan kamera')" />
-        <select id="selectCamera" class="w-full bg-neutral-200 border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
+        <select disabled id="selectCamera" class="w-full bg-neutral-200 border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm">
             <option hidden>Pilih Kamera</option>
         </select>
     </div>
-    <div class="py-3 flex items-center uppercase text-sm text-gray-800 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6 dark:text-white dark:before:border-neutral-600 dark:after:border-neutral-600">
+    <div class="my-3 py-3 flex items-center uppercase text-sm text-gray-800 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6 dark:text-white dark:before:border-neutral-600 dark:after:border-neutral-600">
         Atau
     </div>
     <div>
-        <x-input-label for="selectCamera" :value="__('Unggah Barcode (.png)')" />
-        <input type="file" id="qr-input-file" class="block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:disabled:opacity-50 file:disabled:pointer-events-none dark:text-neutral-500 dark:file:bg-blue-500 dark:hover:file:bg-blue-400" accept="image/png" placeholder="scan file">
+        <x-input-label for="qr-input-file" :value="__('Unggah Barcode (.png)')" />
+        <input disabled type="file" id="qr-input-file" class="block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:disabled:opacity-50 file:disabled:pointer-events-none dark:text-neutral-500 dark:file:bg-blue-500 dark:hover:file:bg-blue-400" accept="image/png" placeholder="scan file">
     </div>
     <div id="reader"></div>
     @endif
@@ -207,6 +316,17 @@ new class extends Component {
         return visitorId;
     });
     const visitor = await fpPromise;
+
+    const config = { 
+        fps: 6,
+        qrbox: {width: 240, height: 240},
+        disableFlip: true,
+    }
+    const html5QrCode = new Html5Qrcode("reader");
+    const fileinput = document.getElementById('qr-input-file');
+    
+    var target = document.querySelector('#reader');
+    var select = document.querySelector('#selectCamera');
     
     @this.deviceInformasi = deviceInfo;
     @this.osInformasi = osInfo;
@@ -242,33 +362,10 @@ new class extends Component {
             @this.latdUser = e.coords.latitude ?? null;
             @this.lotdUser = e.coords.longitude ?? null;
             // Livewire.dispatch('lokasi-didapat');
+            select.disabled = false;
+            fileinput.disabled = false;
         })
     );
-    
-    function validasiOtp(otpForm,otpQr)
-    {
-        @this.fingerPrint = visitor;
-        if(parseInt(otpForm) === parseInt(otpQr)){
-            return true;
-        }
-        return false;
-    }
-
-    async function simpanAbsensi()
-    {
-        Livewire.dispatch('simpan-absensi');
-    }
-    
-    const config = { 
-        fps: 6,
-        qrbox: {width: 240, height: 240},
-        disableFlip: true,
-    }
-
-    const html5QrCode = new Html5Qrcode("reader");
-    let target = document.querySelector('#reader');
-    var select = document.querySelector('#selectCamera');
-    const fileinput = document.getElementById('qr-input-file');
 
     select.addEventListener('change', function(value){
         Livewire.dispatch('select-camera', {cameraId:this.value});
@@ -288,20 +385,15 @@ new class extends Component {
     Livewire.on('camera-start', async ({cameraId}) => {
         target.setAttribute('class', 'my-6 size-full md:size-auto rounded border-8');
         const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-            let otpForm = @this.otp; 
-            // @this.informasiUser = decodedText;
-            // let userOtp = JSON.parse(decodedText);
-            let state = validasiOtp(otpForm,userOtp.otp);
+            @this.urlCode = decodedText;
             html5QrCode.pause(true);
-            if(state === false){
+            getData(decodedText).then(msg =>{
+                @this.statusQr = msg.status;
                 setTimeout(() => {
-                    Livewire.dispatch('invalid-otp');
-                }, 1500);
-            }else{
-                setTimeout(() => {
-                    simpanAbsensi();
-                }, 1500);
-            }
+                    html5QrCode.stop();
+                    Livewire.dispatch('check-signed');
+                }, 1000);
+            });
         };
         const qrCodeErrorCallback = (error) => {
             console.warn(`Code scan error = ${error}`);
@@ -363,8 +455,10 @@ new class extends Component {
             @this.urlCode = qrCodeMessage;
             getData(qrCodeMessage).then(msg =>{
                 @this.statusQr = msg.status;
+                @this.statusQrJenis = msg.tipe;
+                setTimeout(() => {
                 Livewire.dispatch('check-signed');
-                // html5QrCode.clear();
+                }, 1000);
             });
         })
         .catch(err => {
@@ -380,6 +474,7 @@ new class extends Component {
             location.reload();
         }, 5500);
     });
+    
     Livewire.on('batal-absen', () => {
         html5QrCode.clear();
         location.reload();

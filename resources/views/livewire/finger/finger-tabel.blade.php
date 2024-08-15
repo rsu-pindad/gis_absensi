@@ -85,6 +85,7 @@ new class extends Component {
                 return $data;
         }
     }
+    
 }; ?>
 
 <section>

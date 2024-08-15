@@ -24,8 +24,12 @@ return new class extends Migration
             $table->ipAddress('devices_ip')->nullable();
             $table->json('informasi_device')->nullable();
             $table->json('informasi_os')->nullable();
-            $table->double('lotd_user_barcode')->nullable();
-            $table->double('latd_user_barcode')->nullable();
+            $table->double('lotd_user_barcode_masuk')->nullable();
+            $table->double('latd_user_barcode_masuk')->nullable();
+            $table->double('lotd_user_barcode_keluar')->nullable();
+            $table->double('latd_user_barcode_keluar')->nullable();
+            $table->time('user_masuk', $precision = 0)->nullable();
+            $table->time('user_keluar', $precision = 0)->nullable();
             $table
                 ->foreign('user_id')
                 ->references('id')

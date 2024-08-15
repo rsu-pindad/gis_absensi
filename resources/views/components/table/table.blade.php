@@ -23,7 +23,7 @@
         <div class="ms-auto text-muted">
             <div class="py-4">
                 <x-input-label for="search" :value="__('Cari:')" />
-                <x-text-input wire:model.live.debounce.500ms="search" type="text" aria-label="cari-data" placeholder="cari data.." class="md:w-full" />
+                <x-text-input wire:model.live.throttle.500ms="search" type="text" aria-label="cari-data" placeholder="cari data.." class="md:w-full" />
             </div>
         </div>
         <div class="rounded-lg border border-gray-200 dark:border-gray-700">

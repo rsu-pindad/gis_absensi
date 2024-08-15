@@ -144,6 +144,7 @@ new class extends Component
             </div>
         </form>
     </div>
+    
 </section>
 
 @push('modulejs')
@@ -160,8 +161,21 @@ new class extends Component
     // Add the control to the map.
     map.addControl(
         new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken
-            , mapboxgl: mapboxgl
+            accessToken: mapboxgl.accessToken, 
+            mapboxgl: mapboxgl,
+            // marker: false,
+            placeholder: 'Cari tempat',
+            countries: 'id',
+            bbox: [
+                94.915567305,
+                -11.092337999,
+                141.022151,
+                6.160876721
+            ],
+            // proximity: {
+            //     longitude: 107.60998,
+            //     latitude: -6.919709
+            // },
         }).on('result', function({result}){
             // console.log(result);
             // console.log(result.place_name);
@@ -189,8 +203,8 @@ new class extends Component
             
             @this.latd = e.coords.latitude ?? null;
             @this.lotd = e.coords.longitude ?? null;
-            @this.instansi = null
-            @this.alamat = null
+            @this.instansi = null;
+            @this.alamat = null;
         })
     );
 
