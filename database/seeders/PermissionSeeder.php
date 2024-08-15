@@ -8,6 +8,8 @@ use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class PermissionSeeder extends Seeder
 {
@@ -106,27 +108,44 @@ class PermissionSeeder extends Seeder
         // $role3 = Role::create(['name' => 'Super-Admin']);
         // gets all permissions via Gate::before rule; see AuthServiceProvider
 
+        $pass = config('app.seeder_default');
         // create demo users
         $user = User::factory()->create([
             'npp' => 'sdm',
             'email' => 'sdm@pindadmedika.com',
+            'no_hp' => '08562160040',
+            'email_verified_at' => now(),
+            'password' => Hash::make($pass), // password
+            'remember_token' => Str::random(10),
         ]);
         $user->assignRole($role1);
 
         $user = User::factory()->create([
             'npp' => '12503',
             'email' => 'rizky.rizky@pindadmedika.com',
+            'no_hp' => '08562160039',
+            'email_verified_at' => now(),
+            'password' => Hash::make($pass), // password
+            'remember_token' => Str::random(10),
         ]);
         $user->assignRole($role2);
 
         $user = User::factory()->create([
             'npp' => '12504',
             'email' => 'axel@pindadmedika.com',
+            'no_hp' => '08562160038',
+            'email_verified_at' => now(),
+            'password' => Hash::make($pass), // password
+            'remember_token' => Str::random(10),
         ]);
         $user->assignRole($role2);
         $user = User::factory()->create([
             'npp' => '12505',
             'email' => 'adits@pindadmedika.com',
+            'no_hp' => '08562160037',
+            'email_verified_at' => now(),
+            'password' => Hash::make($pass), // password
+            'remember_token' => Str::random(10),
         ]);
         $user->assignRole($role2);
 
