@@ -42,8 +42,10 @@ new class extends Component {
                 ['label' => 'IP User', 'column' => 'devices_ip', 'isData' => true, 'hasRelation'=> false],
                 ['label' => 'Info Device', 'column' => 'informasi_device', 'isData' => true, 'hasRelation'=> false],
                 ['label' => 'Info Os', 'column' => 'informasi_os', 'isData' => true, 'hasRelation'=> false],
-                ['label' => 'User Longitude', 'column' => 'lotd_user_barcode', 'isData' => true, 'hasRelation'=> false],
-                ['label' => 'User Latitude', 'column' => 'latd_user_barcode', 'isData' => true, 'hasRelation'=> false],
+                ['label' => 'User Longitude Masuk', 'column' => 'lotd_user_barcode_masuk', 'isData' => true, 'hasRelation'=> false],
+                ['label' => 'User Latitude Masuk', 'column' => 'latd_user_barcode_masuk', 'isData' => true, 'hasRelation'=> false],
+                ['label' => 'User Longitude Keluar', 'column' => 'lotd_user_barcode_keluar', 'isData' => true, 'hasRelation'=> false],
+                ['label' => 'User Latitude Keluar', 'column' => 'latd_user_barcode_keluar', 'isData' => true, 'hasRelation'=> false],
     
                 ['label' => 'Aksi', 'column' => 'action', 'isData' => false, 'hasRelation'=> false],
             ],
