@@ -33,7 +33,7 @@ new class extends Component {
     public function mount()
     {
         // $this->users = User::where('id', '!=', Auth::id())->get();
-        $this->users = User::select(['id','npp','email'])->get();
+        $this->users = User::select(['id','npp','email'])->withoutRole('sdm')->get();
         $this->absensi = Absensi::with('parentLokasi')->get();
         $this->selectData = json_encode($this->users);
         // dd($this->selectData);
