@@ -110,7 +110,7 @@ class PermissionSeeder extends Seeder
 
         $pass = config('app.seeder_default');
         // create demo users
-        $user = User::factory()->create([
+        $user = User::create([
             'npp' => 'sdm',
             'email' => 'sdm@pindadmedika.com',
             'no_hp' => '08562160040',
@@ -120,7 +120,7 @@ class PermissionSeeder extends Seeder
         ]);
         $user->assignRole($role1);
 
-        $user = User::factory()->create([
+        $user = User::create([
             'npp' => '12503',
             'email' => 'rizky.rizky@pindadmedika.com',
             'no_hp' => '08562160039',
@@ -130,7 +130,7 @@ class PermissionSeeder extends Seeder
         ]);
         $user->assignRole($role2);
 
-        $user = User::factory()->create([
+        $user = User::create([
             'npp' => '12504',
             'email' => 'axel@pindadmedika.com',
             'no_hp' => '08562160038',
@@ -139,7 +139,7 @@ class PermissionSeeder extends Seeder
             'remember_token' => Str::random(10),
         ]);
         $user->assignRole($role2);
-        $user = User::factory()->create([
+        $user = User::create([
             'npp' => '12505',
             'email' => 'adits@pindadmedika.com',
             'no_hp' => '08562160037',
