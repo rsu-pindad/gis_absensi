@@ -43,7 +43,7 @@ new class extends Component {
     public function sendQr($user,$qrData)
     {
         try {
-            $user = User::select('no_hp')->findOrFail($user);
+            $user = User::select(['id','npp','no_hp'])->findOrFail($user);
             $url = Storage::disk('public')->url('qr/QR'.$qrData.'.png');
             $curl = curl_init();
             curl_setopt_array($curl, array(
