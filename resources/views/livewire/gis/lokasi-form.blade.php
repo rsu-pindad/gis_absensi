@@ -13,18 +13,13 @@ new class extends Component
     use LivewireAlert;
 
     public $lotd;
-    
     public $latd;
-    
     public string $instansi = '';
-
     public string $alamat = '';
-
     public string $token = '';
 
     #[Locked]
     public $id;
-
     protected $listeners = [
         'confirmedDelete',
         'dismissedDelete'
@@ -38,18 +33,25 @@ new class extends Component
     #[Renderless]
     public function simpanLokasi() : void
     {
-        $lokasi = new Lokasi;
-
-        $validated = $this->validate([
-            'lotd' => ['required', 'numeric'],
-            'latd' => ['required', 'numeric'],
-            'instansi' => ['required', 'string', 'max:255', 'min:5'],
-        ]);
-
-        $lokasi->fill($validated);
-        $lokasi->save();
-        // $this->dispatch('lokasi-simpan')->self();
-        $this->dispatch('lokasi-simpan');
+        try {
+            $validated = $this->validate([
+                'lotd' => ['required', 'numeric'],
+                'latd' => ['required', 'numeric'],
+                'instansi' => ['required', 'string', 'max:255', 'min:5'],
+                'alamat' => ['string']
+            ]);
+            $lokasi = new Lokasi;
+            $lokasi->fill($validated);
+            $lokasi->save();
+            $this->dispatch('lokasi-simpan')->self();
+        } catch (ValidationException $e) {
+            $this->alert('error', 'terjadi kesalahan simpan lokasi', [
+                'position' => 'center',
+                'timer' => '5000',
+                'toast' => true,
+                'text' => $e->getMessage(),
+            ]);
+        }
     }
 
     #[On('delete-confirmation')]
@@ -84,7 +86,7 @@ new class extends Component
             ]);
         } catch (\Throwable $th) {
             //throw $th;
-            $this->alert('warning', 'terjadi kesalahan', [
+            $this->alert('error', 'terjadi kesalahan hapus', [
                 'position' => 'center',
                 'timer' => '5000',
                 'toast' => true,
@@ -106,7 +108,7 @@ new class extends Component
     </header>
 
     <div class="flex flex-col">
-        <div id="map" class="w-full h-80 my-6" on="lokasi-simpan">
+        <div id="map" class="w-full h-80 my-6">
         </div>
         <form wire:submit="simpanLokasi" class="mt-4 space-y-6">
             <div class="flex gap-4">
@@ -150,12 +152,19 @@ new class extends Component
 @push('modulejs')
 <script type="module">
     mapboxgl.accessToken = `{{$this->token}}`;
+    
+    const bounds = [
+        [105.86423376155824,-5.944196053217013],
+        [114.5014844899303,-8.748119654988429]
+    ];
+
     const map = new mapboxgl.Map({
         container: 'map',
         // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
-        style: 'mapbox://styles/mapbox/streets-v12'
-        , center: [107.646407, -6.924785]
-        , zoom: 15
+        style: 'mapbox://styles/mapbox/dark-v11', 
+        center: [107.646407, -6.924785], 
+        zoom: 15,
+        maxBounds: bounds
     });
 
     // Add the control to the map.
@@ -164,7 +173,7 @@ new class extends Component
             accessToken: mapboxgl.accessToken, 
             mapboxgl: mapboxgl,
             // marker: false,
-            placeholder: 'Cari tempat',
+            placeholder: 'Cari lokasi dinas',
             countries: 'id',
             bbox: [
                 94.915567305,
@@ -194,15 +203,15 @@ new class extends Component
             positionOptions: {
                 enableHighAccuracy: true
             },
-            trackUserLocation: true,
+            trackUserLocation: false,
             showUserHeading: true,
         }).on('geolocate', (e) => {
             // console.log(e);
             // console.log(e.coords.latitude);
             // console.log(e.coords.longitude);
             
-            @this.latd = e.coords.latitude ?? null;
             @this.lotd = e.coords.longitude ?? null;
+            @this.latd = e.coords.latitude ?? null;
             @this.instansi = null;
             @this.alamat = null;
         })
@@ -211,8 +220,8 @@ new class extends Component
     map.on('click', (e) => {
         // console.log(e);
 
-        @this.lotd = e.lngLat.lng ?? null;
         @this.latd = e.lngLat.lat ?? null;
+        @this.lotd = e.lngLat.lng ?? null;
         @this.instansi = null
         @this.alamat = null
 

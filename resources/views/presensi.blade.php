@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
     <div class="py-12">
-        <div class="grid md:grid-cols-2 grid-cols-1 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="grid grid-cols-1 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6 justify-items-center">
             <div class="p-4 sm:p-8 bg-neutral-400 dark:bg-neutral-800 shadow sm:rounded-lg">
                 <div class="max-w-xl">
                     <livewire:presensi.presensi-form />

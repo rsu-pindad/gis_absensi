@@ -78,7 +78,7 @@ new class extends Component {
         $status = $this->statusQr;
         $this->radioTipeAbsen = $this->statusQrJenis;
         sleep(1);
-        if($status !== 200)
+        if($status != 200)
         {
             return $this->alert('warning', 'Absen', [
                 'position' => 'center',
@@ -196,6 +196,12 @@ new class extends Component {
             }else{
                 $msg = 'Halo '.Auth::user()->npp.' Terimakasih Absensi keluar berhasil di catat';
             }
+            $target = '';
+            if(config('app.env') == 'production'){
+                $target = Auth::user()->no_hp;
+            }else{
+                $target = '0818831140';
+            }
             $curl = curl_init();
             curl_setopt_array($curl, array(
                 CURLOPT_URL => 'https://api.fonnte.com/send',
@@ -207,14 +213,14 @@ new class extends Component {
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => array(
-                'target' => '0818831140',
+                'target' => $target,
                 // 'target' => $user->no_hp,
                 'message' => $msg,
                 // 'url' => $url,
                 // 'filename' => 'Qr Absensi',
                 'schedule' => 0,
                 'typing' => false,
-                'delay' => '5',
+                'delay' => '15',
                 'countryCode' => '62',
                 // 'file' => $url,
                 // 'file' => new CURLFile('qr/QR'.$qrData),
@@ -342,7 +348,8 @@ new class extends Component {
 
     const map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v12',
+        // style: 'mapbox://styles/mapbox/streets-v12',
+        style: 'mapbox://styles/mapbox/dark-v11',
         center: [
                 107.60998,
                 -6.919709

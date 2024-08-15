@@ -84,7 +84,9 @@ new class extends Component {
 }; ?>
 
 <section wire:poll.visible.30s>
-    <h6 class="text-base dark:text-white">tabel data diperbarui setiap 30 detik</h6>
-    <div class="py-3 flex items-center text-sm text-gray-800 before:flex-1 before:border-t before:border-gray-200 before:me-6 dark:text-white dark:before:border-neutral-600">terakhir data didapat {{now()->format('d-M-Y H:i')}}</div>
-    <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$absensi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title" />
+    <div>
+        <h6 class="text-base dark:text-white">tabel data diperbarui setiap 30 detik</h6>
+        <div class="py-3 flex items-center text-sm text-gray-800 before:flex-1 before:border-t before:border-gray-200 before:me-6 dark:text-white dark:before:border-neutral-600">terakhir data didapat {{now()->format('d-M-Y H:i')}}</div>
+        <x-table.table :columns="$columns" :page="$page" :perPage="$perPage" :items="$absensi" :sortColumn="$sortColumn" :sortDirection="$sortDirection" isModalEdit="true" :title="$this->title" />
+    </div>
 </section>

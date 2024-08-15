@@ -175,7 +175,7 @@ new class extends Component {
 }; ?>
 
 <section>
-    <form class="flex flex-col mt-6 space-y-6">
+    <form class="flex flex-col space-y-6">
         <div class="flex-auto">
             <x-input-label for="selectAbsensi" class="text-sm font-medium text-gray-900" :value="__('Instansi')" />
             <x-select-input wire:model="selectAbsensi" id="selectAbsensi" name="selectAbsensi" :items="$this->absensi" :nameValue="$this->selectName" required />

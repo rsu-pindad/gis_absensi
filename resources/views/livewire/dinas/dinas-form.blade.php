@@ -77,7 +77,7 @@ new class extends Component {
 
     <div id="map" class="w-full h-96 my-6"></div>
 
-    <form wire:submit="buatBarcode" class="mt-6 space-y-6">
+    <form wire:submit="buatBarcode" class="flex flex-col space-y-6">
         <div>
             <x-input-label for="otp" :value="__('OTP')" />
             <x-text-input wire:model="otp" id="otp" name="otp" type="text" class="mt-1 block w-full cursor-not-allowed focus:cursor-auto hover:cursor-not-allowed" placeholder="aktifkan lokasi dulu" required disabled />
@@ -117,14 +117,19 @@ new class extends Component {
     if(!mapboxgl.supported()){
         alert('browser (peramban) tidak mendukung maps');
     }
+    const bounds = [
+        [105.86423376155824,-5.944196053217013],
+        [114.5014844899303,-8.748119654988429]
+    ];
     const map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v12',
+        style: 'mapbox://styles/mapbox/dark-v11',
         center: [
                 107.60998,
                 -6.919709
             ],
         zoom: 15,
+        maxBounds: bounds
     });
     map.scrollZoom.disable();
     map.addControl(
