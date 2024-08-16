@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.0",
+        "mailersend/laravel-driver": "^2.6",
         "milon/barcode": "^11.0",
         "spatie/laravel-permission": "^6.9",
         "wire-elements/modal": "^2.0"
@@ -71,7 +72,8 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
         }
     },
     "minimum-stability": "stable",
