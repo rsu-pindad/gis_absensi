@@ -43,4 +43,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // protected static function boot()
+    // {
+    //     parent::boot();
+
+    //     // static::deleting(function ($user) {
+    //     //     $user->pivotsKaryawaProfile()->detach();
+    //     // });
+    //     static::create(function($user){
+    //         $user->assignRole(['karyawan']);
+    //     });
+    // }
 }
